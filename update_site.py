@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
@@ -174,7 +174,8 @@ def main():
     text = replace_const_array(text, 'ranking', ranking)
     text = replace_const_array(text, 'schedule', schedule)
     text = replace_const_array(text, 'players', players)
-    today = datetime.now().strftime('%Y-%m-%d %H:%M KST')
+    kst = timezone(timedelta(hours=9))
+    today = datetime.now(kst).strftime('%Y-%m-%d %H:%M KST')
     text = re.sub(r'(<span id="updateDateText">)(.*?)(</span>)', lambda m: f'{m.group(1)}{today}{m.group(3)}', text)
     HTML_PATH.write_text(text, encoding='utf-8')
 

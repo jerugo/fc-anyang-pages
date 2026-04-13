@@ -1140,7 +1140,7 @@
             <span class="small">${match.date} · R${match.round}</span>
           </div>
           <div class="teams">${formatMatchTitle(match)}</div>
-          <div class="muted">${match.time} · ${match.venue} · 안양종합경기장 기준 ${venueDistanceKm[match.venue]?.toFixed(1) ?? '-'}km</div>
+          <div class="muted">${match.time} · ${match.venue} · ${venueDistanceKm[match.venue]?.toFixed(1) ?? '-'}km</div>
         </div>
       `).join('');
 
