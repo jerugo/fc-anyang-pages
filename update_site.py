@@ -161,8 +161,8 @@ def fetch_players():
 
 def replace_const_array(text, const_name, data):
     replacement = f"const {const_name} = {json.dumps(data, ensure_ascii=False, indent=6)};"
-    pattern = rf'const {const_name} = \[(.*?)\n    \];'
-    return re.sub(pattern, replacement, text, flags=re.S)
+    pattern = rf'const {const_name} = \[(?:.*?)\];'
+    return re.sub(pattern, lambda m: replacement, text, flags=re.S)
 
 
 def main():
