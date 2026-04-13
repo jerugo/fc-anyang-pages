@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FC안양 허브</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08090a;
+      --panel: #0f1011;
+      --surface: rgba(255,255,255,0.03);
+      --surface-2: rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.08);
+      --border-soft: rgba(255,255,255,0.05);
+      --text: #f7f8f8;
+      --text-2: #d0d6e0;
+      --text-3: #8a8f98;
+      --brand: #7c3aed;
+      --brand-2: #9b5cff;
+      --good: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --chip: rgba(124,58,237,0.16);
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: radial-gradient(circle at top, rgba(124,58,237,.18), transparent 30%), var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+    body { -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    .wrap { width: min(1280px, calc(100% - 32px)); margin: 0 auto; }
+    header { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(14px); background: rgba(8,9,10,.78); border-bottom: 1px solid var(--border-soft); }
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: -.4px; }
+    .brand-badge { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--brand), #5e6ad2); display: grid; place-items: center; box-shadow: var(--shadow); }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .hero { padding: 18px 0 12px; display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .hero-card, .panel, .kpi { padding: 16px; }
+    h1 { margin: 0; font-size: clamp(24px, 5vw, 34px); line-height: 1.04; letter-spacing: -.8px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .chip { padding: 10px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); font-size: 13px; }
+    .hero-side { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+    .kpi h3, .section-title { margin: 0 0 10px; font-size: 16px; color: var(--text-2); font-weight: 600; letter-spacing: -.2px; }
+    .teams { font-size: 18px; font-weight: 700; letter-spacing: -.5px; }
+    .small { font-size: 12px; color: var(--text-3); }
+    .section { margin-top: 16px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 10px; }
+    .section-head p { margin: 0; color: var(--text-3); }
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 12px; }
+    .input, .select, .btn-toggle { background: rgba(255,255,255,.03); border: 1px solid var(--border); color: var(--text); border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+    .input { min-width: 260px; flex: 1; }
+    .btn-toggle { cursor: pointer; padding: 10px 14px; }
+    .btn-toggle.active { background: rgba(124,58,237,.22); border-color: rgba(155,92,255,.45); color: #e9dcff; }
+    .schedule-controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+    .schedule-scroll { max-height: 420px; overflow: auto; display:grid; gap:10px; padding-right: 2px; }
+    .match { padding: 14px; border: 1px solid var(--border-soft); border-radius: 14px; background: rgba(255,255,255,0.02); display: grid; gap: 7px; }
+    .match-top { display:flex; justify-content:space-between; gap:10px; align-items:center; }
+    .status { font-size: 12px; padding: 6px 10px; border-radius: 999px; background: var(--chip); color: #cbb8ff; border: 1px solid rgba(155,92,255,.35); }
+    .status.done { background: rgba(16,185,129,.12); color: #7bf0bf; border-color: rgba(16,185,129,.3); }
+    .status.soon { background: rgba(245,158,11,.12); color: #ffd081; border-color: rgba(245,158,11,.3); }
+    .muted { color: var(--text-3); }
+    .calendar-wrap { display:none; }
+    .calendar-wrap.active, .list-wrap.active { display:block; }
+    .month-nav { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+    .month-title { font-size:16px; font-weight:700; }
+    .month-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
+    .weekday, .day { border-radius: 14px; }
+    .weekday { padding: 10px 4px; text-align:center; color: var(--text-3); font-size: 12px; border: 1px solid transparent; }
+    .day { min-height: 106px; padding: 10px; border: 1px solid var(--border-soft); background: rgba(255,255,255,.02); display:flex; flex-direction:column; gap:6px; }
+    .day.empty { background: transparent; border-color: transparent; }
+    .day-num { font-size: 12px; color: var(--text-2); font-weight: 600; }
+    .day-match { padding: 6px 7px; border-radius: 10px; background: rgba(124,58,237,.14); border: 1px solid rgba(124,58,237,.2); font-size: 11px; line-height: 1.35; color: var(--text); }
+    .day-match.done { background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.22); }
+    .day-match.away { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.08); }
+    table { width: 100%; border-collapse: collapse; }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 16px; border: 1px solid var(--border); }
+    .table-scroll table { min-width: 760px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--border-soft); text-align: left; font-size: 14px; }
+    th { color: var(--text-3); font-weight: 600; position: sticky; top: 0; background: rgba(15,16,17,.95); backdrop-filter: blur(8px); }
+    tbody tr:hover { background: rgba(255,255,255,.02); }
+    .rank-row { background: rgba(124,58,237,.08); }
+    .players-wrap { max-height: 720px; overflow: auto; border-radius: 16px; border: 1px solid var(--border); }
+    .players-wrap table { min-width: 860px; }
+    .players-wrap th:nth-child(3), .players-wrap td:nth-child(3) { width: 42px; min-width: 42px; max-width: 42px; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
+    .right { text-align:right; }
+    footer { padding: 18px 0 36px; color: var(--text-3); }
+    @media (max-width: 980px) {
+      .hero-side { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .wrap { width: min(100% - 20px, 1280px); }
+      .hero-card, .panel, .kpi { padding: 14px; }
+      .hero-side { grid-template-columns: 1fr; }
+      .teams { font-size: 16px; }
+      .month-grid { gap:6px; }
+      .day { min-height: 88px; padding: 8px; }
+      .day-match { font-size: 10px; padding: 5px 6px; }
+      th, td { padding: 10px 8px; font-size: 13px; }
+      .input { min-width: 100%; }
+      .players-wrap { max-height: none; }
+      .schedule-scroll { max-height: 60vh; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <div class="brand">
+        <div class="brand-badge">A</div>
+        <div>
+          <div>FC안양 허브</div>
+          <div class="small mono">fc-anyang all-in-one dashboard</div>
+        </div>
+      </div>
+      <div class="small">업데이트 기준: P26-04-13</span></div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="hero">
+      <div class="card hero-card">
+        <div class="small mono">FC ANYANG DASHBOARD</div>
+        <h1>일정 · 순위 · 선수기록</h1>
+        <div class="meta">
+          <div class="chip">현역 36명</div>
+          <div class="chip" id="rankChip">현재 9위</div>
+          <div class="chip" id="scheduleCountChip">전체 일정 33경기</div>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="card kpi">
+          <h3>직전 경기</h3>
+          <div class="teams" id="recentMatchTitle">김천 1 : 1 안양</div>
+          <div class="small" id="recentMatchDate">2026-04-12</div>
+        </div>
+        <div class="card kpi">
+          <h3>다음 경기</h3>
+          <div class="teams" id="nextMatchTitle">포항 vs 안양</div>
+          <div class="small" id="nextMatchDate">2026-04-19 16:30</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">경기 일정</h2>
+        </div>
+      </div>
+      <div class="card panel">
+        <div class="schedule-controls">
+          <button id="listViewBtn" class="btn-toggle active">리스트</button>
+          <button id="calendarViewBtn" class="btn-toggle">달력</button>
+          <select id="monthFilter" class="select" style="display:none !important"></select>
+        </div>
+        <div id="listWrap" class="list-wrap active">
+          <div id="scheduleList" class="schedule-scroll"></div>
+        </div>
+        <div id="calendarWrap" class="calendar-wrap">
+          <div class="month-nav">
+            <button id="prevMonthBtn" class="btn-toggle">◀</button>
+            <div id="monthTitle" class="month-title"></div>
+            <button id="nextMonthBtn" class="btn-toggle">▶</button>
+          </div>
+          <div class="month-grid" id="calendarGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">팀 순위</h2>
+        </div>
+      </div>
+      <div class="card panel">
+        <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>순위</th><th>클럽</th><th>경기</th><th>승점</th><th>승</th><th>무</th><th>패</th><th>득점</th><th>실점</th><th>득실차</th></tr>
+          </thead>
+          <tbody id="rankingBody"></tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">선수 기록</h2>
+        </div>
+      </div>
+      <div class="card panel">
+        <div class="toolbar">
+          <input id="searchInput" class="input" placeholder="선수 이름 검색" />
+          <select id="posFilter" class="select">
+            <option value="ALL">전체 포지션</option>
+            <option value="GK">GK</option>
+            <option value="DF">DF</option>
+            <option value="MF">MF</option>
+            <option value="FW">FW</option>
+          </select>
+        </div>
+        <div class="players-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>번호</th>
+                <th>이름</th>
+                <th>포지션</th>
+                <th class="right">2026 기록</th>
+                <th class="right">통산 기록</th>
+                <th>생년월일</th>
+                <th>국적</th>
+              </tr>
+            </thead>
+            <tbody id="playersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer>FC안양 대시보드</footer>
+  </div>
+
+  <script>
+    const ranking = [
+      {
+            "rank": 1,
+            "club": "서울",
+            "games": 6,
+            "points": 16,
+            "win": 5,
+            "draw": 1,
+            "loss": 0,
+            "goals": 12,
+            "against": 3,
+            "diff": 9
+      },
+      {
+            "rank": 2,
+            "club": "울산",
+            "games": 6,
+            "points": 13,
+            "win": 4,
+            "draw": 1,
+            "loss": 1,
+            "goals": 9,
+            "against": 5,
+            "diff": 4
+      },
+      {
+            "rank": 3,
+            "club": "전북",
+            "games": 7,
+            "points": 11,
+            "win": 3,
+            "draw": 2,
+            "loss": 2,
+            "goals": 8,
+            "against": 6,
+            "diff": 2
+      },
+      {
+            "rank": 4,
+            "club": "강원",
+            "games": 7,
+            "points": 9,
+            "win": 2,
+            "draw": 3,
+            "loss": 2,
+            "goals": 8,
+            "against": 6,
+            "diff": 2
+      },
+      {
+            "rank": 5,
+            "club": "부천",
+            "games": 7,
+            "points": 9,
+            "win": 2,
+            "draw": 3,
+            "loss": 2,
+            "goals": 6,
+            "against": 6,
+            "diff": 0
+      },
+      {
+            "rank": 6,
+            "club": "포항",
+            "games": 7,
+            "points": 9,
+            "win": 2,
+            "draw": 3,
+            "loss": 2,
+            "goals": 4,
+            "against": 5,
+            "diff": -1
+      },
+      {
+            "rank": 7,
+            "club": "제주",
+            "games": 7,
+            "points": 8,
+            "win": 2,
+            "draw": 2,
+            "loss": 3,
+            "goals": 6,
+            "against": 7,
+            "diff": -1
+      },
+      {
+            "rank": 8,
+            "club": "인천",
+            "games": 7,
+            "points": 7,
+            "win": 2,
+            "draw": 1,
+            "loss": 4,
+            "goals": 9,
+            "against": 12,
+            "diff": -3
+      },
+      {
+            "rank": 9,
+            "club": "안양",
+            "games": 7,
+            "points": 7,
+            "win": 1,
+            "draw": 4,
+            "loss": 2,
+            "goals": 7,
+            "against": 8,
+            "diff": -1
+      },
+      {
+            "rank": 10,
+            "club": "김천",
+            "games": 7,
+            "points": 6,
+            "win": 0,
+            "draw": 6,
+            "loss": 1,
+            "goals": 6,
+            "against": 7,
+            "diff": -1
+      },
+      {
+            "rank": 11,
+            "club": "대전",
+            "games": 7,
+            "points": 6,
+            "win": 1,
+            "draw": 3,
+            "loss": 3,
+            "goals": 6,
+            "against": 8,
+            "diff": -2
+      },
+      {
+            "rank": 12,
+            "club": "광주",
+            "games": 7,
+            "points": 6,
+            "win": 1,
+            "draw": 3,
+            "loss": 3,
+            "goals": 4,
+            "against": 12,
+            "diff": -8
+      }
+];
+
+    const schedule = [
+      {
+            "date": "2026.03.02",
+            "time": "14:00",
+            "home": "대전",
+            "away": "안양",
+            "homeGoal": 1,
+            "awayGoal": 1,
+            "status": "종료",
+            "venue": "대전 월드컵",
+            "round": 1
+      },
+      {
+            "date": "2026.03.08",
+            "time": "16:30",
+            "home": "안양",
+            "away": "제주",
+            "homeGoal": 2,
+            "awayGoal": 1,
+            "status": "종료",
+            "venue": "안양 종합",
+            "round": 2
+      },
+      {
+            "date": "2026.03.15",
+            "time": "16:30",
+            "home": "강원",
+            "away": "안양",
+            "homeGoal": 1,
+            "awayGoal": 1,
+            "status": "종료",
+            "venue": "강릉하이원아레나",
+            "round": 3
+      },
+      {
+            "date": "2026.03.18",
+            "time": "19:30",
+            "home": "전북",
+            "away": "안양",
+            "homeGoal": 2,
+            "awayGoal": 1,
+            "status": "종료",
+            "venue": "전주 월드컵",
+            "round": 4
+      },
+      {
+            "date": "2026.03.22",
+            "time": "16:30",
+            "home": "안양",
+            "away": "인천",
+            "homeGoal": 0,
+            "awayGoal": 1,
+            "status": "종료",
+            "venue": "안양 종합",
+            "round": 5
+      },
+      {
+            "date": "2026.04.05",
+            "time": "14:00",
+            "home": "안양",
+            "away": "서울",
+            "homeGoal": 1,
+            "awayGoal": 1,
+            "status": "종료",
+            "venue": "안양 종합",
+            "round": 6
+      },
+      {
+            "date": "2026.04.12",
+            "time": "16:30",
+            "home": "김천",
+            "away": "안양",
+            "homeGoal": 1,
+            "awayGoal": 1,
+            "status": "종료",
+            "venue": "김천 종합",
+            "round": 7
+      },
+      {
+            "date": "2026.04.19",
+            "time": "16:30",
+            "home": "포항",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "포항 스틸야드",
+            "round": 8
+      },
+      {
+            "date": "2026.04.22",
+            "time": "19:30",
+            "home": "안양",
+            "away": "울산",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 9
+      },
+      {
+            "date": "2026.04.26",
+            "time": "16:30",
+            "home": "광주",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "광주 월드컵",
+            "round": 10
+      },
+      {
+            "date": "2026.05.02",
+            "time": "19:00",
+            "home": "안양",
+            "away": "부천",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 11
+      },
+      {
+            "date": "2026.05.05",
+            "time": "19:00",
+            "home": "서울",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "서울 월드컵",
+            "round": 12
+      },
+      {
+            "date": "2026.05.10",
+            "time": "16:30",
+            "home": "안양",
+            "away": "전북",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 13
+      },
+      {
+            "date": "2026.05.13",
+            "time": "19:30",
+            "home": "안양",
+            "away": "김천",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 14
+      },
+      {
+            "date": "2026.05.17",
+            "time": "16:30",
+            "home": "제주",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "제주 월드컵",
+            "round": 15
+      },
+      {
+            "date": "2026.07.04",
+            "time": "19:30",
+            "home": "안양",
+            "away": "포항",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 16
+      },
+      {
+            "date": "2026.07.12",
+            "time": "19:30",
+            "home": "인천",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "인천 전용",
+            "round": 17
+      },
+      {
+            "date": "2026.07.19",
+            "time": "19:30",
+            "home": "안양",
+            "away": "광주",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 18
+      },
+      {
+            "date": "2026.07.22",
+            "time": "19:30",
+            "home": "부천",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "부천 종합",
+            "round": 19
+      },
+      {
+            "date": "2026.07.26",
+            "time": "19:30",
+            "home": "안양",
+            "away": "강원",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 20
+      },
+      {
+            "date": "2026.08.02",
+            "time": "19:30",
+            "home": "울산",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "울산 문수",
+            "round": 21
+      },
+      {
+            "date": "2026.08.08",
+            "time": "19:30",
+            "home": "안양",
+            "away": "대전",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 22
+      },
+      {
+            "date": "2026.08.15",
+            "time": "19:30",
+            "home": "제주",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "제주 월드컵",
+            "round": 23
+      },
+      {
+            "date": "2026.08.22",
+            "time": "19:30",
+            "home": "안양",
+            "away": "서울",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 24
+      },
+      {
+            "date": "2026.08.26",
+            "time": "19:30",
+            "home": "안양",
+            "away": "인천",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 25
+      },
+      {
+            "date": "2026.08.29",
+            "time": "19:30",
+            "home": "부천",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "부천 종합",
+            "round": 26
+      },
+      {
+            "date": "2026.09.06",
+            "time": "19:00",
+            "home": "안양",
+            "away": "강원",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 27
+      },
+      {
+            "date": "2026.09.09",
+            "time": "19:30",
+            "home": "대전",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "대전 월드컵",
+            "round": 28
+      },
+      {
+            "date": "2026.09.13",
+            "time": "19:00",
+            "home": "광주",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "광주 월드컵",
+            "round": 29
+      },
+      {
+            "date": "2026.09.19",
+            "time": "19:00",
+            "home": "안양",
+            "away": "울산",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 30
+      },
+      {
+            "date": "2026.10.10",
+            "time": "16:30",
+            "home": "김천",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "김천 종합",
+            "round": 31
+      },
+      {
+            "date": "2026.10.18",
+            "time": "16:30",
+            "home": "포항",
+            "away": "안양",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "포항 스틸야드",
+            "round": 32
+      },
+      {
+            "date": "2026.10.24",
+            "time": "14:00",
+            "home": "안양",
+            "away": "전북",
+            "homeGoal": 0,
+            "awayGoal": 0,
+            "status": "예정",
+            "venue": "안양 종합",
+            "round": 33
+      }
+];
+
+    const players = [];
+
+    const rankingBody = document.getElementById('rankingBody');
+    ranking.forEach(row => {
+      const tr = document.createElement('tr');
+      if (row.club === '안양') tr.className = 'rank-row';
+      tr.innerHTML = `<td>${row.rank}</td><td>${row.club}</td><td>${row.games}</td><td>${row.points}</td><td>${row.win}</td><td>${row.draw}</td><td>${row.loss}</td><td>${row.goals}</td><td>${row.against}</td><td>${row.diff}</td>`;
+      rankingBody.appendChild(tr);
+    });
+
+    const anyangRank = ranking.find(r => r.club === '안양');
+    if (anyangRank) {
+      document.getElementById('rankChip').textContent = `현재 ${anyangRank.rank}위`;
+    }
+    document.getElementById('scheduleCountChip').textContent = `전체 일정 ${schedule.length}경기`;
+    const completedMatches = schedule.filter(m => m.status === '종료');
+    const upcomingMatches = schedule.filter(m => m.status !== '종료');
+    const recentMatch = completedMatches[completedMatches.length - 1];
+    const nextMatch = upcomingMatches[0];
+    if (recentMatch) {
+      document.getElementById('recentMatchTitle').textContent = `${recentMatch.home} ${recentMatch.homeGoal} : ${recentMatch.awayGoal} ${recentMatch.away}`;
+      document.getElementById('recentMatchDate').textContent = recentMatch.date;
+    }
+    if (nextMatch) {
+      document.getElementById('nextMatchTitle').textContent = `${nextMatch.home} vs ${nextMatch.away}`;
+      document.getElementById('nextMatchDate').textContent = `${nextMatch.date} ${nextMatch.time}`;
+    }
+
+    const scheduleList = document.getElementById('scheduleList');
+    const monthFilter = document.getElementById('monthFilter');
+    const monthTitle = document.getElementById('monthTitle');
+    const calendarGrid = document.getElementById('calendarGrid');
+    const listWrap = document.getElementById('listWrap');
+    const calendarWrap = document.getElementById('calendarWrap');
+    const listViewBtn = document.getElementById('listViewBtn');
+    const calendarViewBtn = document.getElementById('calendarViewBtn');
+    const prevMonthBtn = document.getElementById('prevMonthBtn');
+    const nextMonthBtn = document.getElementById('nextMonthBtn');
+
+    const months = [...new Set(schedule.map(m => m.date.slice(0,7)))];
+    let currentMonth = months.includes('2026.04') ? '2026.04' : months[0];
+
+    function formatMatchTitle(match) {
+      const score = match.status === '종료' ? `${match.homeGoal} : ${match.awayGoal}` : 'vs';
+      return `${match.home} ${score} ${match.away}`;
+    }
+
+    function renderMonthOptions() {
+      monthFilter.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
+      monthFilter.value = currentMonth;
+    }
+
+    function renderScheduleList() {
+      scheduleList.innerHTML = schedule.map(match => `
+        <div class="match">
+          <div class="match-top">
+            <span class="status ${match.status === '종료' ? 'done' : 'soon'}">${match.status}</span>
+            <span class="small">${match.date} · R${match.round}</span>
+          </div>
+          <div class="teams">${formatMatchTitle(match)}</div>
+          <div class="muted">${match.time} · ${match.venue}</div>
+        </div>
+      `).join('');
+
+      requestAnimationFrame(() => {
+        const completed = scheduleList.querySelectorAll('.match .status.done');
+        const lastCompleted = completed[completed.length - 1]?.closest('.match');
+        if (lastCompleted) {
+          const itemRect = lastCompleted.getBoundingClientRect();
+          const containerRect = scheduleList.getBoundingClientRect();
+          const delta = itemRect.top - containerRect.top - 8;
+          scheduleList.scrollTop += delta;
+        }
+      });
+    }
+
+    function renderCalendar() {
+      const [yearStr, monthStr] = currentMonth.split('.');
+      const year = Number(yearStr);
+      const month = Number(monthStr);
+      const first = new Date(year, month - 1, 1);
+      const lastDay = new Date(year, month, 0).getDate();
+      const startDay = first.getDay();
+      monthTitle.textContent = `${year}년 ${month}월`;
+
+      const monthMatches = schedule.filter(m => m.date.startsWith(currentMonth));
+      const byDay = Object.fromEntries(monthMatches.map(m => [Number(m.date.slice(8,10)), m]));
+
+      const weekdays = ['일','월','화','수','목','금','토'];
+      calendarGrid.innerHTML = weekdays.map(d => `<div class="weekday">${d}</div>`).join('');
+
+      for (let i = 0; i < startDay; i++) {
+        calendarGrid.innerHTML += `<div class="day empty"></div>`;
+      }
+
+      for (let day = 1; day <= lastDay; day++) {
+        const match = byDay[day];
+        if (!match) {
+          calendarGrid.innerHTML += `<div class="day"><div class="day-num">${day}</div></div>`;
+          continue;
+        }
+        const home = match.home === '안양';
+        calendarGrid.innerHTML += `
+          <div class="day">
+            <div class="day-num">${day}</div>
+            <div class="day-match ${match.status === '종료' ? 'done' : ''} ${home ? 'home' : 'away'}">
+              <div>${match.time}</div>
+              <div>${home ? '안양 vs ' + match.away : match.home + ' vs 안양'}</div>
+              <div>${match.status === '종료' ? `${match.homeGoal}:${match.awayGoal}` : '예정'}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function switchView(mode) {
+      const list = mode === 'list';
+      listWrap.classList.toggle('active', list);
+      calendarWrap.classList.toggle('active', !list);
+      listViewBtn.classList.toggle('active', list);
+      calendarViewBtn.classList.toggle('active', !list);
+      monthFilter.style.display = 'none';
+    }
+
+    function setMonth(newMonth) {
+      currentMonth = newMonth;
+      monthFilter.value = currentMonth;
+      renderScheduleList();
+      renderCalendar();
+    }
+
+    renderMonthOptions();
+    renderScheduleList();
+    renderCalendar();
+
+    monthFilter.addEventListener('change', e => setMonth(e.target.value));
+    listViewBtn.addEventListener('click', () => switchView('list'));
+    calendarViewBtn.addEventListener('click', () => switchView('calendar'));
+    prevMonthBtn.addEventListener('click', () => {
+      const idx = months.indexOf(currentMonth);
+      if (idx > 0) setMonth(months[idx - 1]);
+    });
+    nextMonthBtn.addEventListener('click', () => {
+      const idx = months.indexOf(currentMonth);
+      if (idx < months.length - 1) setMonth(months[idx + 1]);
+    });
+
+    const playersBody = document.getElementById('playersBody');
+    const searchInput = document.getElementById('searchInput');
+    const posFilter = document.getElementById('posFilter');
+
+    function renderPlayers() {
+      const keyword = searchInput.value.trim();
+      const pos = posFilter.value;
+      const filtered = players.filter(p => (pos === 'ALL' || p.pos === pos) && (!keyword || p.name.includes(keyword)));
+      playersBody.innerHTML = filtered.map(p => `
+        <tr>
+          <td>${p.no}</td>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.pos}</td>
+          <td class="right mono">${p.s2026}</td>
+          <td class="right mono">${p.career}</td>
+          <td>${p.birth}</td>
+          <td>${p.nation}</td>
+        </tr>
+      `).join('');
+    }
+
+    searchInput.addEventListener('input', renderPlayers);
+    posFilter.addEventListener('change', renderPlayers);
+    renderPlayers();
+  </script>
+</body>
+</html>
