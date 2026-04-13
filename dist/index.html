@@ -755,6 +755,21 @@
       '울산 문수': 293.3,
     };
 
+    const venueFullNames = {
+      '안양 종합': '안양종합운동장',
+      '대전 월드컵': '대전월드컵경기장',
+      '강릉하이원아레나': '강릉하이원아레나',
+      '전주 월드컵': '전주월드컵경기장',
+      '김천 종합': '김천종합운동장',
+      '포항 스틸야드': '포항스틸야드',
+      '광주 월드컵': '광주월드컵경기장',
+      '서울 월드컵': '서울월드컵경기장',
+      '제주 월드컵': '제주월드컵경기장',
+      '인천 전용': '인천축구전용경기장',
+      '부천 종합': '부천종합운동장',
+      '울산 문수': '울산문수축구경기장',
+    };
+
     const players = [
       {
             "no": 1,
@@ -1140,7 +1155,7 @@
             <span class="small">${match.date} · R${match.round}</span>
           </div>
           <div class="teams">${formatMatchTitle(match)}</div>
-          <div class="muted">${match.time} · ${match.venue} · ${venueDistanceKm[match.venue]?.toFixed(1) ?? '-'}km</div>
+          <div class="muted">${match.time} · ${venueFullNames[match.venue] ?? match.venue}${match.home === '안양' ? '' : ` · ${venueDistanceKm[match.venue]?.toFixed(1) ?? '-'}km`}</div>
         </div>
       `).join('');
 
