@@ -64,7 +64,13 @@ def fetch_schedule():
                 'awayGoal': item.get('awayGoal'),
                 'status': status,
                 'venue': item['fieldName'],
+                'venueFull': item.get('fieldNameFull') or item['fieldName'],
                 'round': item['roundId'],
+                'ticketProvider': item.get('company'),
+                'ticketStatus': item.get('ticketStatus'),
+                'ticketYn': item.get('ticketYn'),
+                'goodsCode': item.get('goodsCode'),
+                'externalUrl': item.get('externalUrl'),
             })
     deduped = []
     seen = set()
