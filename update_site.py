@@ -6,7 +6,7 @@ from pathlib import Path
 
 import requests
 
-BASE = Path('/home/jeru/projects/fc-anyang-pages')
+BASE = Path(__file__).resolve().parent
 HTML_PATH = BASE / 'dist' / 'index.html'
 HEADERS = {'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/json; charset=utf-8'}
 
