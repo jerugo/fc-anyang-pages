@@ -175,7 +175,7 @@ def main():
     text = replace_const_array(text, 'schedule', schedule)
     text = replace_const_array(text, 'players', players)
     today = datetime.now().strftime('%Y-%m-%d')
-    text = re.sub(r'(<span id="updateDateText">)(.*?)(</span>)', rf'\1{today}\3', text)
+    text = re.sub(r'(<span id="updateDateText">)(.*?)(</span>)', lambda m: f'{m.group(1)}{today}{m.group(3)}', text)
     HTML_PATH.write_text(text, encoding='utf-8')
 
     print(json.dumps({
