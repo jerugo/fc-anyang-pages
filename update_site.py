@@ -276,11 +276,10 @@ def merge_ticket_data(schedule, ticket_map):
                 match['ticketOpenDateSource'] = None
             continue
 
-        # fallback: FC안양 홈 + 티켓링크 + 예정 경기만 D-4 14:00 추정
-        is_home = match.get('home') == '안양'
+        # fallback: 티켓링크 + 예정 경기는 D-4 14:00 추정(홈/원정 공통)
         is_ticketlink = match.get('ticketProvider') == 'T'
         is_upcoming = match.get('status') != '종료'
-        if is_home and is_ticketlink and is_upcoming:
+        if is_ticketlink and is_upcoming:
             try:
                 game_dt = datetime.strptime(match['date'], '%Y.%m.%d').replace(tzinfo=kst)
                 open_dt = (game_dt - timedelta(days=4)).replace(hour=14, minute=0)
