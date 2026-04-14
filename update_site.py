@@ -48,14 +48,6 @@ def fetch_ranking():
     return rows
 
 
-def get_reserve_open_info(game_date: str, home_team: str):
-    if home_team != '안양':
-        return None, ''
-    match_date = datetime.strptime(game_date, '%Y.%m.%d')
-    reserve_open = (match_date - timedelta(days=3)).replace(hour=14, minute=0)
-    return reserve_open.strftime('%Y.%m.%d %H:%M'), reserve_open.strftime('%m.%d %H:%M')
-
-
 def fetch_schedule():
     all_rows = []
     for month in range(1, 13):
@@ -63,7 +55,6 @@ def fetch_schedule():
         obj = get_json('https://www.kleague.com/getScheduleList.do', payload)
         for item in obj['data']['scheduleList']:
             status = '종료' if item.get('gameStatus') == 'FE' or item.get('endYn') == 'Y' else '예정'
-            reserve_open_at, reserve_open_label = get_reserve_open_info(item['gameDate'], item['homeTeamName'])
             all_rows.append({
                 'date': item['gameDate'],
                 'time': item['gameTime'],
@@ -80,8 +71,6 @@ def fetch_schedule():
                 'ticketYn': item.get('ticketYn'),
                 'goodsCode': item.get('goodsCode'),
                 'externalUrl': item.get('externalUrl'),
-                'reserveOpenAt': reserve_open_at,
-                'reserveOpenLabel': reserve_open_label,
             })
     deduped = []
     seen = set()
