@@ -57,10 +57,17 @@
     .schedule-scroll { max-height: 420px; overflow: auto; display:grid; gap:10px; padding-right: 2px; }
     .match { padding: 14px; border: 1px solid var(--border-soft); border-radius: 14px; background: rgba(255,255,255,0.02); display: grid; gap: 7px; }
     .match-top { display:flex; justify-content:space-between; gap:10px; align-items:center; }
+    .match-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .status { font-size: 12px; padding: 6px 10px; border-radius: 999px; background: var(--chip); color: #cbb8ff; border: 1px solid rgba(155,92,255,.35); }
     .status.done { background: rgba(16,185,129,.12); color: #7bf0bf; border-color: rgba(16,185,129,.3); }
     .status.soon { background: rgba(245,158,11,.12); color: #ffd081; border-color: rgba(245,158,11,.3); }
+    .ticket-chip { font-size: 12px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(124,58,237,.22); background: rgba(255,255,255,.04); color: var(--text-2); }
+    .ticket-chip.ready { border-color: rgba(16,185,129,.3); color: #7bf0bf; background: rgba(16,185,129,.12); }
+    .ticket-chip.pending { border-color: rgba(245,158,11,.3); color: #ffd081; background: rgba(245,158,11,.12); }
+    .ticket-link { color: #d9c9ff; text-decoration: none; }
+    .ticket-link:hover { text-decoration: underline; }
     .muted { color: var(--text-3); }
+    .reserve-meta { color: #b8a5ef; }
     .calendar-wrap { display:none; }
     .calendar-wrap.active, .list-wrap.active { display:block; }
     .month-nav { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
@@ -114,7 +121,7 @@
           <div class="small mono">fc-anyang all-in-one dashboard</div>
         </div>
       </div>
-      <div class="small">업데이트 기준: <span id="updateDateText">2026-04-13 16:36 KST</span></div>
+      <div class="small">업데이트 기준: <span id="updateDateText">2026-04-14 09:55 KST</span></div>
     </div>
   </header>
 
@@ -384,7 +391,15 @@
             "awayGoal": 1,
             "status": "종료",
             "venue": "대전 월드컵",
-            "round": 1
+            "venueFull": "대전 월드컵 경기장",
+            "round": 1,
+            "ticketProvider": "E",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": "",
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.03.08",
@@ -395,7 +410,15 @@
             "awayGoal": 1,
             "status": "종료",
             "venue": "안양 종합",
-            "round": 2
+            "venueFull": "안양 종합 운동장",
+            "round": 2,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.03.05 14:00",
+            "reserveOpenLabel": "03.05 14:00"
       },
       {
             "date": "2026.03.15",
@@ -406,7 +429,15 @@
             "awayGoal": 1,
             "status": "종료",
             "venue": "강릉하이원아레나",
-            "round": 3
+            "venueFull": "강릉하이원아레나",
+            "round": 3,
+            "ticketProvider": "I",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.03.18",
@@ -417,7 +448,15 @@
             "awayGoal": 1,
             "status": "종료",
             "venue": "전주 월드컵",
-            "round": 4
+            "venueFull": "전주 월드컵 경기장",
+            "round": 4,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.03.22",
@@ -428,7 +467,15 @@
             "awayGoal": 1,
             "status": "종료",
             "venue": "안양 종합",
-            "round": 5
+            "venueFull": "안양 종합 운동장",
+            "round": 5,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.03.19 14:00",
+            "reserveOpenLabel": "03.19 14:00"
       },
       {
             "date": "2026.04.05",
@@ -439,7 +486,15 @@
             "awayGoal": 1,
             "status": "종료",
             "venue": "안양 종합",
-            "round": 6
+            "venueFull": "안양 종합 운동장",
+            "round": 6,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.04.02 14:00",
+            "reserveOpenLabel": "04.02 14:00"
       },
       {
             "date": "2026.04.12",
@@ -450,7 +505,15 @@
             "awayGoal": 1,
             "status": "종료",
             "venue": "김천 종합",
-            "round": 7
+            "venueFull": "김천 종합 운동장",
+            "round": 7,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.04.19",
@@ -461,7 +524,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "포항 스틸야드",
-            "round": 8
+            "venueFull": "포항 스틸야드",
+            "round": 8,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.04.22",
@@ -472,7 +543,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 9
+            "venueFull": "안양 종합 운동장",
+            "round": 9,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.04.19 14:00",
+            "reserveOpenLabel": "04.19 14:00"
       },
       {
             "date": "2026.04.26",
@@ -483,7 +562,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "광주 월드컵",
-            "round": 10
+            "venueFull": "광주 월드컵 경기장",
+            "round": 10,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.05.02",
@@ -494,7 +581,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 11
+            "venueFull": "안양 종합 운동장",
+            "round": 11,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.04.29 14:00",
+            "reserveOpenLabel": "04.29 14:00"
       },
       {
             "date": "2026.05.05",
@@ -505,7 +600,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "서울 월드컵",
-            "round": 12
+            "venueFull": "서울 월드컵 경기장",
+            "round": 12,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.05.10",
@@ -516,7 +619,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 13
+            "venueFull": "안양 종합 운동장",
+            "round": 13,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.05.07 14:00",
+            "reserveOpenLabel": "05.07 14:00"
       },
       {
             "date": "2026.05.13",
@@ -527,7 +638,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 14
+            "venueFull": "안양 종합 운동장",
+            "round": 14,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.05.10 14:00",
+            "reserveOpenLabel": "05.10 14:00"
       },
       {
             "date": "2026.05.17",
@@ -538,7 +657,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "제주 월드컵",
-            "round": 15
+            "venueFull": "제주 월드컵 경기장",
+            "round": 15,
+            "ticketProvider": null,
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.07.04",
@@ -549,7 +676,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 16
+            "venueFull": "안양 종합 운동장",
+            "round": 16,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.07.01 14:00",
+            "reserveOpenLabel": "07.01 14:00"
       },
       {
             "date": "2026.07.12",
@@ -560,7 +695,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "인천 전용",
-            "round": 17
+            "venueFull": "인천 축구 전용경기장",
+            "round": 17,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.07.19",
@@ -571,7 +714,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 18
+            "venueFull": "안양 종합 운동장",
+            "round": 18,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.07.16 14:00",
+            "reserveOpenLabel": "07.16 14:00"
       },
       {
             "date": "2026.07.22",
@@ -582,7 +733,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "부천 종합",
-            "round": 19
+            "venueFull": "부천 종합 운동장",
+            "round": 19,
+            "ticketProvider": "I",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.07.26",
@@ -593,7 +752,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 20
+            "venueFull": "안양 종합 운동장",
+            "round": 20,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.07.23 14:00",
+            "reserveOpenLabel": "07.23 14:00"
       },
       {
             "date": "2026.08.02",
@@ -604,7 +771,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "울산 문수",
-            "round": 21
+            "venueFull": "울산 문수 축구경기장",
+            "round": 21,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.08.08",
@@ -615,7 +790,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 22
+            "venueFull": "안양 종합 운동장",
+            "round": 22,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.08.05 14:00",
+            "reserveOpenLabel": "08.05 14:00"
       },
       {
             "date": "2026.08.15",
@@ -626,7 +809,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "제주 월드컵",
-            "round": 23
+            "venueFull": "제주 월드컵 경기장",
+            "round": 23,
+            "ticketProvider": null,
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.08.22",
@@ -637,7 +828,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 24
+            "venueFull": "안양 종합 운동장",
+            "round": 24,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.08.19 14:00",
+            "reserveOpenLabel": "08.19 14:00"
       },
       {
             "date": "2026.08.26",
@@ -648,7 +847,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 25
+            "venueFull": "안양 종합 운동장",
+            "round": 25,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.08.23 14:00",
+            "reserveOpenLabel": "08.23 14:00"
       },
       {
             "date": "2026.08.29",
@@ -659,7 +866,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "부천 종합",
-            "round": 26
+            "venueFull": "부천 종합 운동장",
+            "round": 26,
+            "ticketProvider": "I",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.09.06",
@@ -670,7 +885,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 27
+            "venueFull": "안양 종합 운동장",
+            "round": 27,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.09.03 14:00",
+            "reserveOpenLabel": "09.03 14:00"
       },
       {
             "date": "2026.09.09",
@@ -681,7 +904,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "대전 월드컵",
-            "round": 28
+            "venueFull": "대전 월드컵 경기장",
+            "round": 28,
+            "ticketProvider": "E",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": "",
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.09.13",
@@ -692,7 +923,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "광주 월드컵",
-            "round": 29
+            "venueFull": "광주 월드컵 경기장",
+            "round": 29,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.09.19",
@@ -703,7 +942,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 30
+            "venueFull": "안양 종합 운동장",
+            "round": 30,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.09.16 14:00",
+            "reserveOpenLabel": "09.16 14:00"
       },
       {
             "date": "2026.10.10",
@@ -714,7 +961,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "김천 종합",
-            "round": 31
+            "venueFull": "김천 종합 운동장",
+            "round": 31,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.10.18",
@@ -725,7 +980,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "포항 스틸야드",
-            "round": 32
+            "venueFull": "포항 스틸야드",
+            "round": 32,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": null,
+            "reserveOpenLabel": ""
       },
       {
             "date": "2026.10.24",
@@ -736,7 +999,15 @@
             "awayGoal": 0,
             "status": "예정",
             "venue": "안양 종합",
-            "round": 33
+            "venueFull": "안양 종합 운동장",
+            "round": 33,
+            "ticketProvider": "T",
+            "ticketStatus": null,
+            "ticketYn": null,
+            "goodsCode": null,
+            "externalUrl": null,
+            "reserveOpenAt": "2026.10.21 14:00",
+            "reserveOpenLabel": "10.21 14:00"
       }
 ];
 
@@ -1142,22 +1413,70 @@
       return `${match.home} ${score} ${match.away}`;
     }
 
+    function getTicketProviderLabel(match) {
+      if (match.ticketProvider === 'T') return '티켓링크';
+      if (match.ticketProvider === 'I') return '인터파크';
+      return '';
+    }
+
+    function getTicketUrl(match) {
+      if (match.externalUrl) return match.externalUrl;
+      if (match.ticketProvider === 'T' && match.goodsCode) {
+        return `https://facility.ticketlink.co.kr/facility/direct/member/seat?partnerNo=5NIl4PaZg%2BpIYAPEQvgb9Q%3D%3D&memberIdEnc=&scheduleId=${match.goodsCode}`;
+      }
+      return '';
+    }
+
+    function getTicketBadge(match) {
+      if (match.status === '종료' || match.home !== '안양') return null;
+      const provider = getTicketProviderLabel(match);
+      const url = getTicketUrl(match);
+      if (url) {
+        return { text: provider ? `${provider} 예매하기` : '예매하기', className: 'ready', url };
+      }
+      if (provider) {
+        return { text: `${provider} 준비중`, className: 'pending', url: '' };
+      }
+      if (match.ticketStatus) {
+        return { text: String(match.ticketStatus), className: 'pending', url: '' };
+      }
+      return { text: '예매정보 확인중', className: 'pending', url: '' };
+    }
+
+    function getReserveMeta(match) {
+      if (match.status === '종료' || match.home !== '안양' || !match.reserveOpenLabel) return '';
+      return `예매 오픈 ${match.reserveOpenLabel}`;
+    }
+
     function renderMonthOptions() {
       monthFilter.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
       monthFilter.value = currentMonth;
     }
 
     function renderScheduleList() {
-      scheduleList.innerHTML = schedule.map(match => `
+      scheduleList.innerHTML = schedule.map(match => {
+        const ticketBadge = getTicketBadge(match);
+        const reserveMeta = getReserveMeta(match);
+        const ticketMeta = ticketBadge
+          ? ticketBadge.url
+            ? `<a class="ticket-chip ${ticketBadge.className} ticket-link" href="${ticketBadge.url}" target="_blank" rel="noreferrer">${ticketBadge.text}</a>`
+            : `<span class="ticket-chip ${ticketBadge.className}">${ticketBadge.text}</span>`
+          : '';
+        return `
         <div class="match">
           <div class="match-top">
-            <span class="status ${match.status === '종료' ? 'done' : 'soon'}">${match.status}</span>
+            <div class="match-meta">
+              <span class="status ${match.status === '종료' ? 'done' : 'soon'}">${match.status}</span>
+              ${ticketMeta}
+            </div>
             <span class="small">${match.date} · R${match.round}</span>
           </div>
           <div class="teams">${formatMatchTitle(match)}</div>
-          <div class="muted">${match.time} · ${venueFullNames[match.venue] ?? match.venue}${match.home === '안양' ? '' : ` · ${venueDistanceKm[match.venue]?.toFixed(1) ?? '-'}km`}</div>
+          <div class="muted">${match.time} · ${match.venueFull ?? venueFullNames[match.venue] ?? match.venue}${match.home === '안양' ? '' : ` · ${venueDistanceKm[match.venue]?.toFixed(1) ?? '-'}km`}</div>
+          ${reserveMeta ? `<div class="small reserve-meta">${reserveMeta}</div>` : ''}
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       requestAnimationFrame(() => {
         const completed = scheduleList.querySelectorAll('.match .status.done');
