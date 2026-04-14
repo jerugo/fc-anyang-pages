@@ -73,6 +73,7 @@ def fetch_schedule():
                 'goodsCode': item.get('goodsCode'),
                 'externalUrl': item.get('externalUrl'),
                 'ticketOpenDate': None,
+                'ticketOpenDateSource': None,
             })
     deduped = []
     seen = set()
@@ -194,11 +195,18 @@ def merge_ticket_data(schedule, ticket_map):
     티켓링크 스크래핑 결과를 K리그 일정 데이터에 병합합니다.
     K리그 API의 goodsCode → 직접 예매 링크 생성.
     Playwright 스크래핑으로 ticketOpenDate 보완.
+
+    FC안양 홈경기(티켓링크) 중 오픈일 미확정 건은
+    공식 게시 패턴 기반 일반예매 D-4 14:00(KST)로 보수적 추정치를 채웁니다.
     """
+    kst = timezone(timedelta(hours=9))
+
     for match in schedule:
-        # K리그 API goodsCode로 직접 예매 URL 구성
+        match['ticketOpenDateSource'] = None
+
+        # K리그 API goodsCode로 직접 예매 URL 구성 (이미 오픈)
         if match.get('goodsCode'):
-            match['ticketOpenDate'] = None  # 이미 오픈됨
+            match['ticketOpenDate'] = None
             continue
 
         # Playwright 스크래핑 데이터 매핑
@@ -206,10 +214,30 @@ def merge_ticket_data(schedule, ticket_map):
         if key in ticket_map:
             t = ticket_map[key]
             match['ticketOpenDate'] = t.get('ticketOpenDate')
+            if match['ticketOpenDate']:
+                match['ticketOpenDateSource'] = 'ticketlink'
             if t.get('scheduleId') and not match.get('goodsCode'):
                 match['goodsCode'] = t['scheduleId']
+                match['ticketOpenDate'] = None
+                match['ticketOpenDateSource'] = None
+            continue
+
+        # fallback: FC안양 홈 + 티켓링크 + 예정 경기만 D-4 14:00 추정
+        is_home = match.get('home') == '안양'
+        is_ticketlink = match.get('ticketProvider') == 'T'
+        is_upcoming = match.get('status') != '종료'
+        if is_home and is_ticketlink and is_upcoming:
+            try:
+                game_dt = datetime.strptime(match['date'], '%Y.%m.%d').replace(tzinfo=kst)
+                open_dt = (game_dt - timedelta(days=4)).replace(hour=14, minute=0)
+                match['ticketOpenDate'] = open_dt.strftime('%Y-%m-%d %H:%M')
+                match['ticketOpenDateSource'] = 'policy_d4'
+            except Exception:
+                match['ticketOpenDate'] = None
+                match['ticketOpenDateSource'] = None
         else:
             match['ticketOpenDate'] = None
+            match['ticketOpenDateSource'] = None
 
     return schedule
 
