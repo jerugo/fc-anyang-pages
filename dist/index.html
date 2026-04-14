@@ -1423,8 +1423,10 @@
 
       // 홈 경기 + 티켓링크 예정 → 팀 페이지 링크
       if (isHome && match.ticketProvider === 'T') {
+        const [, mm, dd] = match.date.split('.');
+        const dateLabel = `${parseInt(mm)}/${parseInt(dd)}`;
         return {
-          badge: { text: '티켓링크 예매예정', className: 'upcoming', url: TL_TEAM_URL },
+          badge: { text: `${dateLabel} 티켓링크 예매예정`, className: 'upcoming', url: TL_TEAM_URL },
           openDate: null,
         };
       }
