@@ -29,7 +29,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests
+          pip install requests playwright
+          playwright install chromium --with-deps
           npm install -g wrangler
 
       - name: Update site data

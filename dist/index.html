@@ -64,8 +64,11 @@
     .ticket-chip { font-size: 12px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(124,58,237,.22); background: rgba(255,255,255,.04); color: var(--text-2); }
     .ticket-chip.ready { border-color: rgba(16,185,129,.3); color: #7bf0bf; background: rgba(16,185,129,.12); }
     .ticket-chip.pending { border-color: rgba(245,158,11,.3); color: #ffd081; background: rgba(245,158,11,.12); }
-    .ticket-link { color: #d9c9ff; text-decoration: none; }
+    .ticket-chip.upcoming { border-color: rgba(124,58,237,.35); color: #cbb8ff; background: rgba(124,58,237,.12); }
+    .ticket-link { color: inherit; text-decoration: none; }
     .ticket-link:hover { text-decoration: underline; }
+    .ticket-open-row { display:flex; align-items:center; gap:6px; margin-top:2px; font-size:12px; color: var(--warn); }
+    .ticket-open-row svg { flex-shrink:0; }
     .muted { color: var(--text-3); }
     .calendar-wrap { display:none; }
     .calendar-wrap.active, .list-wrap.active { display:block; }
@@ -120,7 +123,7 @@
           <div class="small mono">fc-anyang all-in-one dashboard</div>
         </div>
       </div>
-      <div class="small">업데이트 기준: <span id="updateDateText">2026-04-14 10:50 KST</span></div>
+      <div class="small">업데이트 기준: <span id="updateDateText">2026-04-14 14:03 KST</span></div>
     </div>
   </header>
 
@@ -396,7 +399,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": ""
+            "externalUrl": "",
+            "ticketOpenDate": null
       },
       {
             "date": "2026.03.08",
@@ -413,7 +417,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.03.15",
@@ -430,7 +435,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.03.18",
@@ -447,7 +453,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.03.22",
@@ -464,7 +471,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.04.05",
@@ -481,7 +489,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.04.12",
@@ -498,7 +507,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.04.19",
@@ -515,7 +525,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.04.22",
@@ -532,7 +543,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.04.26",
@@ -549,7 +561,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.05.02",
@@ -566,7 +579,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.05.05",
@@ -583,7 +597,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.05.10",
@@ -600,7 +615,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.05.13",
@@ -617,7 +633,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.05.17",
@@ -634,7 +651,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.07.04",
@@ -651,7 +669,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.07.12",
@@ -668,7 +687,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.07.19",
@@ -685,7 +705,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.07.22",
@@ -702,7 +723,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.07.26",
@@ -719,7 +741,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.08.02",
@@ -736,7 +759,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.08.08",
@@ -753,7 +777,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.08.15",
@@ -770,7 +795,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.08.22",
@@ -787,7 +813,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.08.26",
@@ -804,7 +831,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.08.29",
@@ -821,7 +849,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.09.06",
@@ -838,7 +867,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.09.09",
@@ -855,7 +885,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": ""
+            "externalUrl": "",
+            "ticketOpenDate": null
       },
       {
             "date": "2026.09.13",
@@ -872,7 +903,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.09.19",
@@ -889,7 +921,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.10.10",
@@ -906,7 +939,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.10.18",
@@ -923,7 +957,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       },
       {
             "date": "2026.10.24",
@@ -940,7 +975,8 @@
             "ticketStatus": null,
             "ticketYn": null,
             "goodsCode": null,
-            "externalUrl": null
+            "externalUrl": null,
+            "ticketOpenDate": null
       }
 ];
 
@@ -1346,9 +1382,12 @@
       return `${match.home} ${score} ${match.away}`;
     }
 
+    const TL_TEAM_URL = 'https://www.ticketlink.co.kr/sports/138/86';
+
     function getTicketProviderLabel(match) {
       if (match.ticketProvider === 'T') return '티켓링크';
       if (match.ticketProvider === 'I') return '인터파크';
+      if (match.ticketProvider === 'E') return '이트';
       return '';
     }
 
@@ -1360,20 +1399,44 @@
       return '';
     }
 
-    function getTicketBadge(match) {
-      if (match.status === '종료') return null;
+    function getTicketInfo(match) {
+      if (match.status === '종료') return { badge: null, openDate: null };
       const provider = getTicketProviderLabel(match);
       const url = getTicketUrl(match);
+      const isHome = match.home === '안양';
+
+      // 예매 진행 중 (goodsCode 있음)
       if (url) {
-        return { text: provider ? `${provider} 예매하기` : '예매하기', className: 'ready', url };
+        return {
+          badge: { text: provider ? `${provider} 예매하기` : '예매하기', className: 'ready', url },
+          openDate: null,
+        };
       }
+
+      // 예매 오픈 날짜가 스크래핑으로 확인된 경우
+      if (match.ticketOpenDate) {
+        return {
+          badge: { text: `예매 오픈 ${match.ticketOpenDate}`, className: 'upcoming', url: TL_TEAM_URL },
+          openDate: match.ticketOpenDate,
+        };
+      }
+
+      // 홈 경기 + 티켓링크 예정 → 팀 페이지 링크
+      if (isHome && match.ticketProvider === 'T') {
+        return {
+          badge: { text: '티켓링크 예매예정', className: 'upcoming', url: TL_TEAM_URL },
+          openDate: null,
+        };
+      }
+
+      // 기타 provider 준비중
       if (provider) {
-        return { text: `${provider} 준비중`, className: 'pending', url: '' };
+        return { badge: { text: `${provider} 준비중`, className: 'pending', url: '' }, openDate: null };
       }
       if (match.ticketStatus) {
-        return { text: String(match.ticketStatus), className: 'pending', url: '' };
+        return { badge: { text: String(match.ticketStatus), className: 'pending', url: '' }, openDate: null };
       }
-      return null;
+      return { badge: null, openDate: null };
     }
 
     function renderMonthOptions() {
@@ -1383,11 +1446,14 @@
 
     function renderScheduleList() {
       scheduleList.innerHTML = schedule.map(match => {
-        const ticketBadge = getTicketBadge(match);
-        const ticketMeta = ticketBadge
-          ? ticketBadge.url
-            ? `<a class="ticket-chip ${ticketBadge.className} ticket-link" href="${ticketBadge.url}" target="_blank" rel="noreferrer">${ticketBadge.text}</a>`
-            : `<span class="ticket-chip ${ticketBadge.className}">${ticketBadge.text}</span>`
+        const { badge, openDate } = getTicketInfo(match);
+        const ticketMeta = badge
+          ? badge.url
+            ? `<a class="ticket-chip ${badge.className} ticket-link" href="${badge.url}" target="_blank" rel="noreferrer">${badge.text}</a>`
+            : `<span class="ticket-chip ${badge.className}">${badge.text}</span>`
+          : '';
+        const openDateRow = openDate
+          ? `<div class="ticket-open-row"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>예매 오픈: <strong>${openDate}</strong></div>`
           : '';
         return `
         <div class="match">
@@ -1400,6 +1466,7 @@
           </div>
           <div class="teams">${formatMatchTitle(match)}</div>
           <div class="muted">${match.time} · ${match.venueFull ?? venueFullNames[match.venue] ?? match.venue}${match.home === '안양' ? '' : ` · ${venueDistanceKm[match.venue]?.toFixed(1) ?? '-'}km`}</div>
+          ${openDateRow}
         </div>
       `;
       }).join('');
