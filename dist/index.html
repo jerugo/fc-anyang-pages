@@ -1361,7 +1361,7 @@
     }
 
     function getTicketBadge(match) {
-      if (match.status === '종료' || match.home !== '안양') return null;
+      if (match.status === '종료') return null;
       const provider = getTicketProviderLabel(match);
       const url = getTicketUrl(match);
       if (url) {
@@ -1373,7 +1373,7 @@
       if (match.ticketStatus) {
         return { text: String(match.ticketStatus), className: 'pending', url: '' };
       }
-      return { text: '예매정보 확인중', className: 'pending', url: '' };
+      return null;
     }
 
     function renderMonthOptions() {
