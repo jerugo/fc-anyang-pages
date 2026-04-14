@@ -6,6 +6,13 @@ from pathlib import Path
 
 import requests
 
+try:
+    import pytesseract
+    from PIL import Image
+except Exception:
+    pytesseract = None
+    Image = None
+
 BASE = Path(__file__).resolve().parent
 HTML_PATH = BASE / 'dist' / 'index.html'
 HEADERS = {'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/json; charset=utf-8'}
@@ -88,10 +95,15 @@ def fetch_schedule():
 
 def fetch_ticket_schedule():
     """
-    m.ticketlink.co.kr/sports/138/86 에서 FC안양 티켓 예매 정보를 스크래핑합니다.
+    Ticketlink 화면 캡처 기반으로 예매 오픈일을 추출합니다.
+    - 데스크톱 페이지 진입
+    - '홈경기만 보기' 체크 해제 상태로 전환
+    - 페이지 캡처(artifact) + OCR 텍스트에서 '오픈예정' 패턴 파싱
+    - mapi 응답 캡처가 가능하면 우선 사용
+
     Returns:
-        dict: key = 'YYYY.MM.DD HH:MM home vs away' 식별자
-              value = {ticketOpenDate, ticketUrl, available}
+        dict: key = 'YYYY.MM.DD HH:MM home away' 또는 'DATE::YYYY.MM.DD'
+              value = {ticketOpenDate, scheduleId, available}
     """
     try:
         from playwright.sync_api import sync_playwright
@@ -100,6 +112,18 @@ def fetch_ticket_schedule():
         return {}
 
     result = {}
+    artifact_dir = BASE / 'artifacts'
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+
+    def upsert_date_key(game_date: str, open_date_iso: str):
+        if not game_date or not open_date_iso:
+            return
+        result[f'DATE::{game_date}'] = {
+            'ticketOpenDate': open_date_iso,
+            'scheduleId': None,
+            'available': False,
+        }
+
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(
@@ -107,86 +131,111 @@ def fetch_ticket_schedule():
                 args=['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
             )
             context = browser.new_context(
-                user_agent='Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 locale='ko-KR',
+                viewport={'width': 1440, 'height': 2200},
             )
             page = context.new_page()
 
-            # mapi/sports/schedules 성공 응답 캡처
+            # 1) API 응답 캡처 (가능하면 가장 신뢰)
             def handle_response(response):
                 if 'mapi.ticketlink.co.kr/mapi/sports/schedules' not in response.url:
                     return
                 try:
                     data = response.json()
                     items = data.get('data')
-                    if not items or items == '':
-                        return
                     if not isinstance(items, list):
                         return
                     kst = timezone(timedelta(hours=9))
                     for item in items:
-                        game_date = item.get('gameDate', '')     # 예: "2026.04.22"
-                        game_time = item.get('gameTime', '')     # 예: "19:00"
+                        game_date = item.get('gameDate', '')
+                        game_time = item.get('gameTime', '')
                         home = item.get('homeTeamName', '')
                         away = item.get('awayTeamName', '')
                         schedule_id = item.get('scheduleId') or item.get('goodsCode')
                         sale_start_ts = item.get('saleStartDatetime') or item.get('saleStart')
-                        sale_end_ts = item.get('saleEndDatetime') or item.get('saleEnd')
 
                         open_date = None
                         if sale_start_ts:
                             try:
-                                ts = int(sale_start_ts) // 1000
+                                ts = int(str(sale_start_ts)) // 1000
                                 open_date = datetime.fromtimestamp(ts, tz=kst).strftime('%Y-%m-%d %H:%M')
                             except Exception:
-                                open_date = str(sale_start_ts)
-
-                        ticket_url = ''
-                        if schedule_id:
-                            ticket_url = (
-                                'https://facility.ticketlink.co.kr/facility/direct/member/seat'
-                                f'?partnerNo=5NIl4PaZg%2BpIYAPEQvgb9Q%3D%3D&memberIdEnc=&scheduleId={schedule_id}'
-                            )
+                                pass
 
                         key = f'{game_date} {game_time} {home} {away}'
                         result[key] = {
                             'ticketOpenDate': open_date,
-                            'ticketUrl': ticket_url,
                             'scheduleId': str(schedule_id) if schedule_id else None,
                             'available': bool(schedule_id),
                         }
+                        if open_date and game_date:
+                            upsert_date_key(game_date, open_date)
                 except Exception:
                     pass
 
             page.on('response', handle_response)
 
-            try:
-                page.goto(
-                    'https://m.ticketlink.co.kr/sports/138/86',
-                    timeout=30000,
-                    wait_until='domcontentloaded',
-                )
-                page.wait_for_timeout(10000)
-            except Exception as e:
-                print(f'[ticket] 페이지 로드: {e}')
+            # 2) 화면 진입 + 홈경기만 보기 체크 해제
+            page.goto('https://www.ticketlink.co.kr/sports/138/86', timeout=45000, wait_until='domcontentloaded')
+            page.wait_for_timeout(5000)
 
-            # DOM에서 예매 가능한 경기 카드 파싱
+            # 체크박스가 체크되어 있으면 반드시 해제
             try:
-                cards = page.query_selector_all('[class*="schedule-item"], [class*="game-item"], [class*="match-item"]')
-                for card in cards:
-                    text = card.inner_text().strip()
-                    if '예매' in text or 'vs' in text or '안양' in text:
-                        print(f'[ticket] DOM 카드: {text[:120]}')
-                        # 날짜/팀 파싱 후 result에 추가 가능
+                cb = page.locator('input[type="checkbox"]').first
+                if cb.count() and cb.is_checked():
+                    cb.click(force=True)
+                    page.wait_for_timeout(2000)
             except Exception:
-                pass
+                try:
+                    toggle = page.get_by_text('홈경기만 보기').first
+                    if toggle.count():
+                        toggle.click(force=True)
+                        page.wait_for_timeout(2000)
+                except Exception:
+                    pass
+
+            # 3) 캡처 저장 (디버깅/검증용)
+            shot_path = artifact_dir / 'ticketlink_schedule_full.png'
+            try:
+                page.screenshot(path=str(shot_path), full_page=True)
+                print(f'[ticket] screenshot saved: {shot_path}')
+            except Exception as e:
+                print(f'[ticket] screenshot failed: {e}')
+
+            # 4) OCR 기반 오픈예정 파싱
+            if pytesseract and Image and shot_path.exists():
+                try:
+                    ocr_text = pytesseract.image_to_string(Image.open(shot_path), lang='kor+eng')
+                except Exception:
+                    ocr_text = ''
+
+                # 블록 단위로 '경기일시 ... 오픈예정일시' 패턴 추출
+                # 예: 2026.04.22(수) 19:30 ... 2026.04.17(금) 14:00 오픈예정
+                block_pattern = re.compile(
+                    r'(20\d{2}\.\d{2}\.\d{2})\([^)]+\)\s*(\d{2}:\d{2})[\s\S]{0,120}?(20\d{2}\.\d{2}\.\d{2})\([^)]+\)\s*(\d{2}:\d{2})\s*오픈예정'
+                )
+                hits = 0
+                for m in block_pattern.finditer(ocr_text):
+                    game_date = m.group(1)
+                    open_date = m.group(3)
+                    open_time = m.group(4)
+                    open_iso = f"{open_date.replace('.', '-')} {open_time}"
+                    upsert_date_key(game_date, open_iso)
+                    hits += 1
+
+                # 오픈예정일시만 단독 인식된 경우(보조)
+                if hits == 0:
+                    only_open = re.findall(r'(20\d{2}\.\d{2}\.\d{2})\([^)]+\)\s*(\d{2}:\d{2})\s*오픈예정', ocr_text)
+                    if only_open:
+                        print(f'[ticket] OCR open-only lines: {len(only_open)} (match-date 미포함)')
 
             browser.close()
 
     except Exception as e:
         print(f'[ticket] 스크래핑 오류: {e}')
 
-    print(f'[ticket] 수집된 경기 수: {len(result)}')
+    print(f'[ticket] 수집된 티켓 키 수: {len(result)}')
     return result
 
 
@@ -209,15 +258,20 @@ def merge_ticket_data(schedule, ticket_map):
             match['ticketOpenDate'] = None
             continue
 
-        # Playwright 스크래핑 데이터 매핑
+        # Playwright 스크래핑 데이터 매핑 (정확키 우선, 날짜키 보조)
         key = f"{match['date']} {match['time']} {match['home']} {match['away']}"
-        if key in ticket_map:
-            t = ticket_map[key]
-            match['ticketOpenDate'] = t.get('ticketOpenDate')
+        date_key = f"DATE::{match['date']}"
+
+        ticket_hit = ticket_map.get(key) or ticket_map.get(date_key)
+        if ticket_hit:
+            match['ticketOpenDate'] = ticket_hit.get('ticketOpenDate')
             if match['ticketOpenDate']:
-                match['ticketOpenDateSource'] = 'ticketlink'
-            if t.get('scheduleId') and not match.get('goodsCode'):
-                match['goodsCode'] = t['scheduleId']
+                if key in ticket_map:
+                    match['ticketOpenDateSource'] = 'ticketlink'
+                else:
+                    match['ticketOpenDateSource'] = 'screenshot_ocr'
+            if ticket_hit.get('scheduleId') and not match.get('goodsCode'):
+                match['goodsCode'] = ticket_hit['scheduleId']
                 match['ticketOpenDate'] = None
                 match['ticketOpenDateSource'] = None
             continue

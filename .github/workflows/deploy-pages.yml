@@ -28,8 +28,10 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
           python -m pip install --upgrade pip
-          pip install requests playwright
+          pip install requests playwright pillow pytesseract
           playwright install chromium --with-deps
           npm install -g wrangler
 
