@@ -102,7 +102,7 @@ def fetch_ticket_schedule():
     - mapi 응답 캡처가 가능하면 우선 사용
 
     Returns:
-        dict: key = 'YYYY.MM.DD HH:MM home away' 또는 'DATE::YYYY.MM.DD'
+        dict: key = 'YYYY.MM.DD HH:MM home away' 또는 'DT::YYYY.MM.DD HH:MM'
               value = {ticketOpenDate, scheduleId, available}
     """
     try:
@@ -114,15 +114,6 @@ def fetch_ticket_schedule():
     result = {}
     artifact_dir = BASE / 'artifacts'
     artifact_dir.mkdir(parents=True, exist_ok=True)
-
-    def upsert_date_key(game_date: str, open_date_iso: str):
-        if not game_date or not open_date_iso:
-            return
-        result[f'DATE::{game_date}'] = {
-            'ticketOpenDate': open_date_iso,
-            'scheduleId': None,
-            'available': False,
-        }
 
     try:
         with sync_playwright() as p:
@@ -169,8 +160,6 @@ def fetch_ticket_schedule():
                             'scheduleId': str(schedule_id) if schedule_id else None,
                             'available': bool(schedule_id),
                         }
-                        if open_date and game_date:
-                            upsert_date_key(game_date, open_date)
                 except Exception:
                     pass
 
@@ -218,10 +207,15 @@ def fetch_ticket_schedule():
                 hits = 0
                 for m in block_pattern.finditer(ocr_text):
                     game_date = m.group(1)
+                    game_time = m.group(2)
                     open_date = m.group(3)
                     open_time = m.group(4)
                     open_iso = f"{open_date.replace('.', '-')} {open_time}"
-                    upsert_date_key(game_date, open_iso)
+                    result[f'DT::{game_date} {game_time}'] = {
+                        'ticketOpenDate': open_iso,
+                        'scheduleId': None,
+                        'available': False,
+                    }
                     hits += 1
 
                 # 오픈예정일시만 단독 인식된 경우(보조)
@@ -245,11 +239,9 @@ def merge_ticket_data(schedule, ticket_map):
     K리그 API의 goodsCode → 직접 예매 링크 생성.
     Playwright 스크래핑으로 ticketOpenDate 보완.
 
-    FC안양 홈경기(티켓링크) 중 오픈일 미확정 건은
-    공식 게시 패턴 기반 일반예매 D-4 14:00(KST)로 보수적 추정치를 채웁니다.
+    정책 기반 추정치(폴백)는 사용하지 않고,
+    직접 수집(ticketlink/screenshot_ocr) 값만 ticketOpenDate에 반영합니다.
     """
-    kst = timezone(timedelta(hours=9))
-
     for match in schedule:
         match['ticketOpenDateSource'] = None
 
@@ -258,11 +250,11 @@ def merge_ticket_data(schedule, ticket_map):
             match['ticketOpenDate'] = None
             continue
 
-        # Playwright 스크래핑 데이터 매핑 (정확키 우선, 날짜키 보조)
+        # Playwright 스크래핑 데이터 매핑 (정확키 우선, OCR 일치키 보조)
         key = f"{match['date']} {match['time']} {match['home']} {match['away']}"
-        date_key = f"DATE::{match['date']}"
+        dt_key = f"DT::{match['date']} {match['time']}"
 
-        ticket_hit = ticket_map.get(key) or ticket_map.get(date_key)
+        ticket_hit = ticket_map.get(key) or ticket_map.get(dt_key)
         if ticket_hit:
             match['ticketOpenDate'] = ticket_hit.get('ticketOpenDate')
             if match['ticketOpenDate']:
@@ -276,21 +268,9 @@ def merge_ticket_data(schedule, ticket_map):
                 match['ticketOpenDateSource'] = None
             continue
 
-        # fallback: 티켓링크 + 예정 경기는 D-4 14:00 추정(홈/원정 공통)
-        is_ticketlink = match.get('ticketProvider') == 'T'
-        is_upcoming = match.get('status') != '종료'
-        if is_ticketlink and is_upcoming:
-            try:
-                game_dt = datetime.strptime(match['date'], '%Y.%m.%d').replace(tzinfo=kst)
-                open_dt = (game_dt - timedelta(days=4)).replace(hour=14, minute=0)
-                match['ticketOpenDate'] = open_dt.strftime('%Y-%m-%d %H:%M')
-                match['ticketOpenDateSource'] = 'policy_d4'
-            except Exception:
-                match['ticketOpenDate'] = None
-                match['ticketOpenDateSource'] = None
-        else:
-            match['ticketOpenDate'] = None
-            match['ticketOpenDateSource'] = None
+        # 폴백 비활성화: 직접 수집(ticketlink/screenshot_ocr) 외에는 오픈일 미표시
+        match['ticketOpenDate'] = None
+        match['ticketOpenDateSource'] = None
 
     return schedule
 
