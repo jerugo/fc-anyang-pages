@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "description": "구단별 공식 예매 오픈 규칙(일반예매 기준). 확인된 규칙만 입력하고, 미확인은 비워둡니다.",
+    "timezone": "Asia/Seoul",
+    "source_policy": "official club ticket policy/posts"
+  },
+  "안양": {
+    "general_sale": {
+      "days_before": 4,
+      "time": "14:00",
+      "source": "FC안양 2026 홈경기 공식 공지 기준"
+    },
+    "presale": {
+      "days_before": 5,
+      "time": "14:00"
+    }
+  },
+  "서울": {},
+  "울산": {},
+  "전북": {},
+  "강원": {},
+  "부천": {},
+  "포항": {},
+  "제주": {},
+  "인천": {},
+  "김천": {},
+  "대전": {},
+  "광주": {}
+}

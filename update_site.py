@@ -15,6 +15,7 @@ except Exception:
 
 BASE = Path(__file__).resolve().parent
 HTML_PATH = BASE / 'dist' / 'index.html'
+POLICY_RULES_PATH = BASE / 'ticket_policy_rules.json'
 HEADERS = {'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/json; charset=utf-8'}
 TL_TEAM_URL = 'https://www.ticketlink.co.kr/sports/138/86'
 
@@ -91,6 +92,42 @@ def fetch_schedule():
             deduped.append(row)
     deduped.sort(key=lambda x: (x['date'], x['time']))
     return deduped
+
+
+def load_ticket_policy_rules():
+    if not POLICY_RULES_PATH.exists():
+        return {}
+    try:
+        data = json.loads(POLICY_RULES_PATH.read_text(encoding='utf-8'))
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def apply_policy_open_date(match, policy_rules):
+    if match.get('status') == '종료':
+        return None
+
+    home_team = match.get('home')
+    if not home_team:
+        return None
+
+    rule = policy_rules.get(home_team)
+    if not isinstance(rule, dict):
+        return None
+
+    general = rule.get('general_sale')
+    if not isinstance(general, dict):
+        return None
+
+    try:
+        days_before = int(general.get('days_before'))
+        open_time = str(general.get('time', '14:00'))
+        match_dt = datetime.strptime(match['date'], '%Y.%m.%d')
+        open_date = (match_dt - timedelta(days=days_before)).strftime('%Y-%m-%d')
+        return f'{open_date} {open_time}'
+    except Exception:
+        return None
 
 
 def fetch_ticket_schedule():
@@ -192,31 +229,31 @@ def fetch_ticket_schedule():
     return result
 
 
-def merge_ticket_data(schedule, ticket_map):
+def merge_ticket_data(schedule, ticket_map, policy_rules):
     """
-    OCR로 직접 추출한 값만 사용하고,
-    다음 경기(가장 이른 예정 경기)에만 ticketOpenDate를 반영합니다.
+    1) OCR 직접 추출값을 우선 반영
+    2) OCR 값이 없으면 홈팀 정책 룰(공식 예매 오픈 규칙)로 보완
     """
-    next_match = next((m for m in schedule if m.get('status') != '종료'), None)
-    next_key = None
-    if next_match:
-        next_key = (next_match['date'], next_match['time'], next_match['home'], next_match['away'])
-
     for match in schedule:
         match['ticketOpenDate'] = None
         match['ticketOpenDateSource'] = None
 
-        # 다음 경기 외에는 예매일자 미표시
-        key = (match['date'], match['time'], match['home'], match['away'])
-        if key != next_key:
+        if match.get('status') == '종료':
             continue
 
-        # OCR 일치키로만 반영
+        # OCR 일치키 우선
         dt_key = f"DT::{match['date']} {match['time']}"
         ticket_hit = ticket_map.get(dt_key)
         if ticket_hit and ticket_hit.get('ticketOpenDate'):
             match['ticketOpenDate'] = ticket_hit['ticketOpenDate']
             match['ticketOpenDateSource'] = 'screenshot_ocr'
+            continue
+
+        # 정책 룰 보완
+        policy_open = apply_policy_open_date(match, policy_rules)
+        if policy_open:
+            match['ticketOpenDate'] = policy_open
+            match['ticketOpenDateSource'] = 'policy_rule'
 
     return schedule
 
@@ -313,7 +350,8 @@ def main():
     ranking = fetch_ranking()
     schedule = fetch_schedule()
     ticket_map = fetch_ticket_schedule()
-    schedule = merge_ticket_data(schedule, ticket_map)
+    policy_rules = load_ticket_policy_rules()
+    schedule = merge_ticket_data(schedule, ticket_map, policy_rules)
     players = fetch_players()
 
     text = HTML_PATH.read_text(encoding='utf-8')
