@@ -95,15 +95,14 @@ def fetch_schedule():
 
 def fetch_ticket_schedule():
     """
-    Ticketlink 화면 캡처 기반으로 예매 오픈일을 추출합니다.
+    Ticketlink 화면 캡처(OCR) 기반으로 예매 오픈일을 추출합니다.
     - 데스크톱 페이지 진입
     - '홈경기만 보기' 체크 해제 상태로 전환
     - 페이지 캡처(artifact) + OCR 텍스트에서 '오픈예정' 패턴 파싱
-    - mapi 응답 캡처가 가능하면 우선 사용
 
     Returns:
-        dict: key = 'YYYY.MM.DD HH:MM home away' 또는 'DT::YYYY.MM.DD HH:MM'
-              value = {ticketOpenDate, scheduleId, available}
+        dict: key = 'DT::YYYY.MM.DD HH:MM'
+              value = {ticketOpenDate}
     """
     try:
         from playwright.sync_api import sync_playwright
@@ -128,44 +127,6 @@ def fetch_ticket_schedule():
             )
             page = context.new_page()
 
-            # 1) API 응답 캡처 (가능하면 가장 신뢰)
-            def handle_response(response):
-                if 'mapi.ticketlink.co.kr/mapi/sports/schedules' not in response.url:
-                    return
-                try:
-                    data = response.json()
-                    items = data.get('data')
-                    if not isinstance(items, list):
-                        return
-                    kst = timezone(timedelta(hours=9))
-                    for item in items:
-                        game_date = item.get('gameDate', '')
-                        game_time = item.get('gameTime', '')
-                        home = item.get('homeTeamName', '')
-                        away = item.get('awayTeamName', '')
-                        schedule_id = item.get('scheduleId') or item.get('goodsCode')
-                        sale_start_ts = item.get('saleStartDatetime') or item.get('saleStart')
-
-                        open_date = None
-                        if sale_start_ts:
-                            try:
-                                ts = int(str(sale_start_ts)) // 1000
-                                open_date = datetime.fromtimestamp(ts, tz=kst).strftime('%Y-%m-%d %H:%M')
-                            except Exception:
-                                pass
-
-                        key = f'{game_date} {game_time} {home} {away}'
-                        result[key] = {
-                            'ticketOpenDate': open_date,
-                            'scheduleId': str(schedule_id) if schedule_id else None,
-                            'available': bool(schedule_id),
-                        }
-                except Exception:
-                    pass
-
-            page.on('response', handle_response)
-
-            # 2) 화면 진입 + 홈경기만 보기 체크 해제
             page.goto('https://www.ticketlink.co.kr/sports/138/86', timeout=45000, wait_until='domcontentloaded')
             page.wait_for_timeout(5000)
 
@@ -213,8 +174,6 @@ def fetch_ticket_schedule():
                     open_iso = f"{open_date.replace('.', '-')} {open_time}"
                     result[f'DT::{game_date} {game_time}'] = {
                         'ticketOpenDate': open_iso,
-                        'scheduleId': None,
-                        'available': False,
                     }
                     hits += 1
 
@@ -235,42 +194,29 @@ def fetch_ticket_schedule():
 
 def merge_ticket_data(schedule, ticket_map):
     """
-    티켓링크 스크래핑 결과를 K리그 일정 데이터에 병합합니다.
-    K리그 API의 goodsCode → 직접 예매 링크 생성.
-    Playwright 스크래핑으로 ticketOpenDate 보완.
-
-    정책 기반 추정치(폴백)는 사용하지 않고,
-    직접 수집(ticketlink/screenshot_ocr) 값만 ticketOpenDate에 반영합니다.
+    OCR로 직접 추출한 값만 사용하고,
+    다음 경기(가장 이른 예정 경기)에만 ticketOpenDate를 반영합니다.
     """
+    next_match = next((m for m in schedule if m.get('status') != '종료'), None)
+    next_key = None
+    if next_match:
+        next_key = (next_match['date'], next_match['time'], next_match['home'], next_match['away'])
+
     for match in schedule:
-        match['ticketOpenDateSource'] = None
-
-        # K리그 API goodsCode로 직접 예매 URL 구성 (이미 오픈)
-        if match.get('goodsCode'):
-            match['ticketOpenDate'] = None
-            continue
-
-        # Playwright 스크래핑 데이터 매핑 (정확키 우선, OCR 일치키 보조)
-        key = f"{match['date']} {match['time']} {match['home']} {match['away']}"
-        dt_key = f"DT::{match['date']} {match['time']}"
-
-        ticket_hit = ticket_map.get(key) or ticket_map.get(dt_key)
-        if ticket_hit:
-            match['ticketOpenDate'] = ticket_hit.get('ticketOpenDate')
-            if match['ticketOpenDate']:
-                if key in ticket_map:
-                    match['ticketOpenDateSource'] = 'ticketlink'
-                else:
-                    match['ticketOpenDateSource'] = 'screenshot_ocr'
-            if ticket_hit.get('scheduleId') and not match.get('goodsCode'):
-                match['goodsCode'] = ticket_hit['scheduleId']
-                match['ticketOpenDate'] = None
-                match['ticketOpenDateSource'] = None
-            continue
-
-        # 폴백 비활성화: 직접 수집(ticketlink/screenshot_ocr) 외에는 오픈일 미표시
         match['ticketOpenDate'] = None
         match['ticketOpenDateSource'] = None
+
+        # 다음 경기 외에는 예매일자 미표시
+        key = (match['date'], match['time'], match['home'], match['away'])
+        if key != next_key:
+            continue
+
+        # OCR 일치키로만 반영
+        dt_key = f"DT::{match['date']} {match['time']}"
+        ticket_hit = ticket_map.get(dt_key)
+        if ticket_hit and ticket_hit.get('ticketOpenDate'):
+            match['ticketOpenDate'] = ticket_hit['ticketOpenDate']
+            match['ticketOpenDateSource'] = 'screenshot_ocr'
 
     return schedule
 
