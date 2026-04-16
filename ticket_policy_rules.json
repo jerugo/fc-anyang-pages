@@ -28,7 +28,18 @@
     }
   },
   "울산": {},
-  "전북": {},
+  "전북": {
+    "general_sale": {
+      "days_before": 4,
+      "time": "11:00",
+      "source": "https://jbhd-upload-file.s3.ap-northeast-2.amazonaws.com/uploadFile/ticket/2026ticket_1.jpg (일반 예매 MATCH DAY D-4 11:00)"
+    },
+    "presale": {
+      "days_before": 5,
+      "time": "11:00",
+      "source": "https://jbhd-upload-file.s3.ap-northeast-2.amazonaws.com/uploadFile/ticket/2026ticket_1.jpg (회원 예매 MATCH DAY D-5 11:00)"
+    }
+  },
   "강원": {},
   "부천": {
     "general_sale": {
