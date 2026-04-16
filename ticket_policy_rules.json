@@ -46,6 +46,12 @@
   "제주": {},
   "인천": {},
   "김천": {},
-  "대전": {},
+  "대전": {
+    "general_sale": {
+      "days_before": 5,
+      "time": "13:00",
+      "source": "https://www.dhcfc.kr/images/sub/ticket_260223.jpg (일반티켓 예매: 홈경기일 기준 5일 전 13시 오픈)"
+    }
+  },
   "광주": {}
 }
