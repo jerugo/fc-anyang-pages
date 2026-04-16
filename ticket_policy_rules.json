@@ -30,7 +30,18 @@
   "울산": {},
   "전북": {},
   "강원": {},
-  "부천": {},
+  "부천": {
+    "general_sale": {
+      "days_before": 4,
+      "time": "14:00",
+      "source": "https://bfc1995.com/media/clubNews/81 (2026시즌 홈경기 일반 예매: 경기일 4일 전 14시)"
+    },
+    "presale": {
+      "days_before": 5,
+      "time": "14:00",
+      "source": "https://bfc1995.com/media/clubNews/81 (2026시즌 홈경기 선예매: 경기일 5일 전 14시)"
+    }
+  },
   "포항": {},
   "제주": {},
   "인천": {},
