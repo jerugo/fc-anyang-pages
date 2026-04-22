@@ -27,7 +27,18 @@
       "source": "https://www.fcseoul.com/tickets/reserveSingleTicket (선예매자 15시)"
     }
   },
-  "울산": {},
+  "울산": {
+    "general_sale": {
+      "days_before": 3,
+      "time": "11:00",
+      "source": "https://www.uhdfc.com/images/sub/ticket/ticket_20260130.jpg (2026시즌 티켓 안내 이미지: 일반티켓 경기 3일 전 오전 11시)"
+    },
+    "presale": {
+      "days_before": 7,
+      "time": "11:00",
+      "source": "https://www.uhdfc.com/images/sub/ticket/ticket_20260130.jpg (2026시즌 티켓 안내 이미지: 선예매 경기 7일 전 오전 11시)"
+    }
+  },
   "전북": {
     "general_sale": {
       "days_before": 4,
@@ -53,7 +64,18 @@
       "source": "https://bfc1995.com/media/clubNews/81 (2026시즌 홈경기 선예매: 경기일 5일 전 14시)"
     }
   },
-  "포항": {},
+  "포항": {
+    "general_sale": {
+      "days_before": 6,
+      "time": "14:00",
+      "source": "https://www.steelers.co.kr/dist/images/match/ticket_intro_2026.jpg (2026 티켓가이드 이미지: 일반예매 경기 6일 전 14시 오픈)"
+    },
+    "presale": {
+      "days_before": 7,
+      "time": "14:00",
+      "source": "https://www.steelers.co.kr/dist/images/match/ticket_intro_2026.jpg (2026 티켓가이드 이미지: 선예매 경기 7일 전 14시 오픈)"
+    }
+  },
   "제주": {},
   "인천": {
     "general_sale": {
