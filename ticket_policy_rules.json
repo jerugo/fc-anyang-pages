@@ -55,7 +55,18 @@
   },
   "포항": {},
   "제주": {},
-  "인천": {},
+  "인천": {
+    "general_sale": {
+      "days_before": 4,
+      "time": "14:00",
+      "source": "https://www.incheonutd.com/ticket/ticket_intro.php (홈경기 온라인 예매: 일반예매 홈경기일 4일전 오후 2시)"
+    },
+    "presale": {
+      "days_before": 5,
+      "time": "14:00",
+      "source": "https://www.incheonutd.com/ticket/ticket_intro.php (선예매 홈경기일 5일전 오후 2시)"
+    }
+  },
   "김천": {},
   "대전": {
     "general_sale": {
