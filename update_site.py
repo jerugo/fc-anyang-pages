@@ -116,18 +116,38 @@ def apply_policy_open_date(match, policy_rules):
     if not isinstance(rule, dict):
         return None
 
-    general = rule.get('general_sale')
-    if not isinstance(general, dict):
-        return None
-
+    match_dt = None
     try:
-        days_before = int(general.get('days_before'))
-        open_time = str(general.get('time', '14:00'))
         match_dt = datetime.strptime(match['date'], '%Y.%m.%d')
-        open_date = (match_dt - timedelta(days=days_before)).strftime('%Y-%m-%d')
-        return f'{open_date} {open_time}'
     except Exception:
         return None
+
+    # 1) 고정 D-n 규칙
+    general = rule.get('general_sale')
+    if isinstance(general, dict):
+        try:
+            days_before = int(general.get('days_before'))
+            open_time = str(general.get('time', '14:00'))
+            open_date = (match_dt - timedelta(days=days_before)).strftime('%Y-%m-%d')
+            return f'{open_date} {open_time}'
+        except Exception:
+            pass
+
+    # 2) 요일 기반 규칙 (예: 제주)
+    weekday_rule = rule.get('general_sale_weekday_rule')
+    if isinstance(weekday_rule, dict):
+        try:
+            open_time = str(weekday_rule.get('time', '12:00'))
+            weekday = match_dt.weekday()  # Mon=0 ... Sun=6
+
+            # 주말 경기(금/토/일) -> 해당 주 월요일 정오
+            if weekday in (4, 5, 6) and weekday_rule.get('weekend_match_open_day') == 'monday':
+                open_dt = match_dt - timedelta(days=weekday)
+                return f"{open_dt.strftime('%Y-%m-%d')} {open_time}"
+        except Exception:
+            pass
+
+    return None
 
 
 def fetch_ticket_schedule():
@@ -229,11 +249,42 @@ def fetch_ticket_schedule():
     return result
 
 
+def fetch_ticketlink_open_date_by_goods_code(goods_code):
+    """Ticketlink mapi/sports/schedule 에서 goodsCode 기준 오픈일을 조회합니다."""
+    if not goods_code:
+        return None
+
+    url = f'https://mapi.ticketlink.co.kr/mapi/sports/schedule?scheduleId={goods_code}'
+    headers = {
+        'User-Agent': 'Mozilla/5.0',
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://www.ticketlink.co.kr',
+        'Referer': 'https://www.ticketlink.co.kr/',
+    }
+
+    try:
+        r = requests.get(url, headers=headers, timeout=20)
+        r.raise_for_status()
+        obj = r.json()
+        data = obj.get('data') if isinstance(obj, dict) else None
+        reserve_open_date = data.get('reserveOpenDate') if isinstance(data, dict) else None
+        if reserve_open_date is None:
+            return None
+        ts = int(reserve_open_date) / 1000
+        kst = timezone(timedelta(hours=9))
+        return datetime.fromtimestamp(ts, tz=kst).strftime('%Y-%m-%d %H:%M')
+    except Exception:
+        return None
+
+
 def merge_ticket_data(schedule, ticket_map, policy_rules):
     """
     1) OCR 직접 추출값을 우선 반영
-    2) OCR 값이 없으면 홈팀 정책 룰(공식 예매 오픈 규칙)로 보완
+    2) Ticketlink goodsCode 기반 오픈일 API 조회
+    3) 그 외 홈팀 정책 룰(공식 예매 오픈 규칙)로 보완
     """
+    goods_open_cache = {}
+
     for match in schedule:
         match['ticketOpenDate'] = None
         match['ticketOpenDateSource'] = None
@@ -248,6 +299,17 @@ def merge_ticket_data(schedule, ticket_map, policy_rules):
             match['ticketOpenDate'] = ticket_hit['ticketOpenDate']
             match['ticketOpenDateSource'] = 'screenshot_ocr'
             continue
+
+        # goodsCode가 있으면 Ticketlink API에서 직접 오픈일 조회
+        goods_code = match.get('goodsCode')
+        if goods_code:
+            if goods_code not in goods_open_cache:
+                goods_open_cache[goods_code] = fetch_ticketlink_open_date_by_goods_code(goods_code)
+            goods_open = goods_open_cache.get(goods_code)
+            if goods_open:
+                match['ticketOpenDate'] = goods_open
+                match['ticketOpenDateSource'] = 'ticketlink_api'
+                continue
 
         # 정책 룰 보완
         policy_open = apply_policy_open_date(match, policy_rules)

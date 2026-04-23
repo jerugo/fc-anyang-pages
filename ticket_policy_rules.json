@@ -76,7 +76,13 @@
       "source": "https://www.steelers.co.kr/dist/images/match/ticket_intro_2026.jpg (2026 티켓가이드 이미지: 선예매 경기 7일 전 14시 오픈)"
     }
   },
-  "제주": {},
+  "제주": {
+    "general_sale_weekday_rule": {
+      "weekend_match_open_day": "monday",
+      "time": "12:00",
+      "source": "https://www.jejuskfc.com/resources/front/images/sub/reservationView/ticketInfo_01.jpeg (26년 티켓오픈 일정: 주말경기(금토일) 월요일 정오 12시)"
+    }
+  },
   "인천": {
     "general_sale": {
       "days_before": 4,
