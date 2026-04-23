@@ -69,6 +69,8 @@
     .ticket-link:hover { text-decoration: underline; }
     .ticket-open-row { display:flex; align-items:center; gap:6px; margin-top:2px; font-size:12px; color: var(--warn); }
     .ticket-open-row svg { flex-shrink:0; }
+    .ticket-open-link { text-decoration: none; }
+    .ticket-open-link:hover { text-decoration: underline; }
     .muted { color: var(--text-3); }
     .calendar-wrap { display:none; }
     .calendar-wrap.active, .list-wrap.active { display:block; }
@@ -1415,25 +1417,43 @@
       return `${match.home} ${score} ${match.away}`;
     }
 
+    function getTicketUrl(match) {
+      if (typeof match.externalUrl === 'string' && match.externalUrl.trim()) {
+        return match.externalUrl.trim();
+      }
+      if (match.goodsCode) {
+        return `https://www.ticketlink.co.kr/product/${match.goodsCode}`;
+      }
+      if (match.ticketProvider === 'T') {
+        return 'https://www.ticketlink.co.kr/sports';
+      }
+      return '';
+    }
+
     function getTicketInfo(match) {
-      if (match.status === '종료') return { badge: null, openDate: null };
+      if (match.status === '종료') return { badge: null, openDate: null, openDateUrl: '' };
+
+      const ticketUrl = getTicketUrl(match);
 
       if (match.ticketOpenDate) {
         if (match.ticketOpenDateSource === 'policy_rule') {
           return {
-            badge: { text: `예매예정 ${match.ticketOpenDate}`, className: 'pending', url: '' },
+            badge: { text: `예매예정 ${match.ticketOpenDate}`, className: 'pending', url: ticketUrl },
             openDate: null,
+            openDateUrl: '',
           };
         }
         return {
-          badge: { text: `예매 오픈 ${match.ticketOpenDate}`, className: 'upcoming', url: '' },
+          badge: { text: `예매 오픈 ${match.ticketOpenDate}`, className: 'upcoming', url: ticketUrl },
           openDate: match.ticketOpenDate,
+          openDateUrl: ticketUrl,
         };
       }
 
       return {
         badge: { text: '예매일자 확인중', className: 'pending', url: '' },
         openDate: null,
+        openDateUrl: '',
       };
     }
 
@@ -1444,14 +1464,17 @@
 
     function renderScheduleList() {
       scheduleList.innerHTML = schedule.map(match => {
-        const { badge, openDate } = getTicketInfo(match);
+        const { badge, openDate, openDateUrl } = getTicketInfo(match);
         const ticketMeta = badge
           ? badge.url
             ? `<a class="ticket-chip ${badge.className} ticket-link" href="${badge.url}" target="_blank" rel="noreferrer">${badge.text}</a>`
             : `<span class="ticket-chip ${badge.className}">${badge.text}</span>`
           : '';
+        const openDateText = `예매 오픈: <strong>${openDate}</strong>`;
         const openDateRow = openDate
-          ? `<div class="ticket-open-row"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>예매 오픈: <strong>${openDate}</strong></div>`
+          ? openDateUrl
+            ? `<a class="ticket-open-row ticket-open-link" href="${openDateUrl}" target="_blank" rel="noreferrer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${openDateText}</a>`
+            : `<div class="ticket-open-row"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${openDateText}</div>`
           : '';
         return `
         <div class="match">
