@@ -92,6 +92,27 @@
     th { color: var(--text-3); font-weight: 600; position: sticky; top: 0; background: rgba(15,16,17,.95); backdrop-filter: blur(8px); }
     tbody tr:hover { background: rgba(255,255,255,.02); }
     .rank-row { background: rgba(124,58,237,.08); }
+    .trend-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, .9fr); gap: 14px; align-items: stretch; }
+    .trend-chart { width: 100%; min-height: 320px; border: 1px solid var(--border-soft); border-radius: 16px; background: rgba(255,255,255,.02); overflow: hidden; }
+    .trend-chart svg { width: 100%; height: 320px; display: block; }
+    .trend-line { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .trend-line.current { stroke: #a78bfa; }
+    .trend-line.previous { stroke: #38bdf8; }
+    .trend-point { stroke: #0f1011; stroke-width: 2; }
+    .trend-point.current { fill: #a78bfa; }
+    .trend-point.previous { fill: #38bdf8; }
+    .trend-axis, .trend-grid-line { stroke: rgba(255,255,255,.14); stroke-width: 1; }
+    .trend-grid-line { stroke-dasharray: 3 5; }
+    .trend-label { fill: var(--text-3); font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+    .trend-legend { display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 10px; color: var(--text-2); font-size: 13px; }
+    .legend-dot { width: 9px; height: 9px; display:inline-block; border-radius:50%; margin-right:6px; }
+    .legend-dot.current { background:#a78bfa; }
+    .legend-dot.previous { background:#38bdf8; }
+    .trend-summary { display:grid; gap:10px; }
+    .trend-card { padding: 12px; border: 1px solid var(--border-soft); border-radius: 14px; background: rgba(255,255,255,.02); }
+    .trend-card strong { display:block; margin-bottom: 4px; }
+    .trend-card .mono { color: var(--text-2); }
+    .trend-note { margin-top: 10px; color: var(--text-3); font-size: 12px; }
     .players-wrap { max-height: 720px; overflow: auto; border-radius: 16px; border: 1px solid var(--border); }
     .players-wrap table { min-width: 860px; }
     .players-wrap th:nth-child(3), .players-wrap td:nth-child(3) { width: 42px; min-width: 42px; max-width: 42px; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
@@ -111,6 +132,8 @@
       th, td { padding: 10px 8px; font-size: 13px; }
       .input { min-width: 100%; }
       .players-wrap { max-height: none; }
+      .trend-grid { grid-template-columns: 1fr; }
+      .trend-chart svg { height: 280px; }
       .schedule-scroll { max-height: 60vh; }
     }
   </style>
@@ -125,7 +148,7 @@
           <div class="small mono">fc-anyang all-in-one dashboard</div>
         </div>
       </div>
-      <div class="small">업데이트 기준: <span id="updateDateText">2026-04-23 13:50 KST</span></div>
+      <div class="small">업데이트 기준: <span id="updateDateText">2026-05-06 16:39 KST</span></div>
     </div>
   </header>
 
@@ -177,6 +200,26 @@
           </div>
           <div class="month-grid" id="calendarGrid"></div>
         </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">라운드별 순위 추이</h2>
+          <p>작년과 올해 FC안양 순위, 승점, 승/무/패 비교</p>
+        </div>
+      </div>
+      <div class="card panel">
+        <div class="trend-legend">
+          <span><i class="legend-dot current"></i>2026</span>
+          <span><i class="legend-dot previous"></i>2025</span>
+        </div>
+        <div class="trend-grid">
+          <div id="rankTrendChart" class="trend-chart"></div>
+          <div id="rankTrendSummary" class="trend-summary"></div>
+        </div>
+        <div class="trend-note">그래프는 라운드 종료 시점 기준이며, 위쪽일수록 높은 순위입니다.</div>
       </div>
     </section>
 
@@ -242,146 +285,146 @@
       {
             "rank": 1,
             "club": "서울",
-            "games": 9,
-            "points": 22,
-            "win": 7,
-            "draw": 1,
-            "loss": 1,
-            "goals": 19,
-            "against": 5,
+            "games": 12,
+            "points": 26,
+            "win": 8,
+            "draw": 2,
+            "loss": 2,
+            "goals": 23,
+            "against": 9,
             "diff": 14
       },
       {
             "rank": 2,
-            "club": "울산",
-            "games": 9,
-            "points": 17,
-            "win": 5,
-            "draw": 2,
-            "loss": 2,
-            "goals": 16,
+            "club": "전북",
+            "games": 12,
+            "points": 21,
+            "win": 6,
+            "draw": 3,
+            "loss": 3,
+            "goals": 19,
             "against": 11,
-            "diff": 5
+            "diff": 8
       },
       {
             "rank": 3,
-            "club": "강원",
-            "games": 9,
-            "points": 13,
-            "win": 3,
-            "draw": 4,
-            "loss": 2,
-            "goals": 12,
-            "against": 7,
-            "diff": 5
+            "club": "울산",
+            "games": 12,
+            "points": 20,
+            "win": 6,
+            "draw": 2,
+            "loss": 4,
+            "goals": 19,
+            "against": 17,
+            "diff": 2
       },
       {
             "rank": 4,
-            "club": "전북",
-            "games": 9,
-            "points": 12,
-            "win": 3,
-            "draw": 3,
+            "club": "강원",
+            "games": 12,
+            "points": 17,
+            "win": 4,
+            "draw": 5,
             "loss": 3,
-            "goals": 10,
-            "against": 9,
-            "diff": 1
+            "goals": 15,
+            "against": 10,
+            "diff": 5
       },
       {
             "rank": 5,
-            "club": "제주",
-            "games": 9,
-            "points": 12,
-            "win": 3,
-            "draw": 3,
-            "loss": 3,
-            "goals": 8,
-            "against": 8,
-            "diff": 0
+            "club": "대전",
+            "games": 12,
+            "points": 16,
+            "win": 4,
+            "draw": 4,
+            "loss": 4,
+            "goals": 16,
+            "against": 10,
+            "diff": 6
       },
       {
             "rank": 6,
             "club": "포항",
-            "games": 9,
-            "points": 12,
-            "win": 3,
-            "draw": 3,
-            "loss": 3,
-            "goals": 5,
-            "against": 6,
+            "games": 12,
+            "points": 16,
+            "win": 4,
+            "draw": 4,
+            "loss": 4,
+            "goals": 9,
+            "against": 10,
             "diff": -1
       },
       {
             "rank": 7,
-            "club": "인천",
-            "games": 9,
-            "points": 11,
+            "club": "안양",
+            "games": 12,
+            "points": 15,
             "win": 3,
-            "draw": 2,
-            "loss": 4,
+            "draw": 6,
+            "loss": 3,
+            "goals": 14,
+            "against": 12,
+            "diff": 2
+      },
+      {
+            "rank": 8,
+            "club": "인천",
+            "games": 12,
+            "points": 15,
+            "win": 4,
+            "draw": 3,
+            "loss": 5,
+            "goals": 14,
+            "against": 16,
+            "diff": -2
+      },
+      {
+            "rank": 9,
+            "club": "제주",
+            "games": 12,
+            "points": 15,
+            "win": 4,
+            "draw": 3,
+            "loss": 5,
+            "goals": 9,
+            "against": 11,
+            "diff": -2
+      },
+      {
+            "rank": 10,
+            "club": "김천",
+            "games": 12,
+            "points": 13,
+            "win": 2,
+            "draw": 7,
+            "loss": 3,
             "goals": 13,
             "against": 15,
             "diff": -2
       },
       {
-            "rank": 8,
-            "club": "안양",
-            "games": 9,
-            "points": 11,
-            "win": 2,
-            "draw": 5,
-            "loss": 2,
-            "goals": 9,
-            "against": 9,
-            "diff": 0
-      },
-      {
-            "rank": 9,
-            "club": "부천",
-            "games": 9,
-            "points": 10,
-            "win": 2,
-            "draw": 4,
-            "loss": 3,
-            "goals": 8,
-            "against": 11,
-            "diff": -3
-      },
-      {
-            "rank": 10,
-            "club": "대전",
-            "games": 9,
-            "points": 9,
-            "win": 2,
-            "draw": 3,
-            "loss": 4,
-            "goals": 7,
-            "against": 9,
-            "diff": -2
-      },
-      {
             "rank": 11,
-            "club": "김천",
-            "games": 9,
-            "points": 7,
-            "win": 0,
-            "draw": 7,
-            "loss": 2,
-            "goals": 7,
-            "against": 11,
-            "diff": -4
+            "club": "부천",
+            "games": 12,
+            "points": 13,
+            "win": 3,
+            "draw": 4,
+            "loss": 5,
+            "goals": 9,
+            "against": 14,
+            "diff": -5
       },
       {
             "rank": 12,
             "club": "광주",
-            "games": 9,
+            "games": 12,
             "points": 6,
             "win": 1,
             "draw": 3,
-            "loss": 5,
-            "goals": 5,
-            "against": 18,
-            "diff": -13
+            "loss": 8,
+            "goals": 7,
+            "against": 32,
+            "diff": -25
       }
 ];
 
@@ -562,19 +605,19 @@
             "time": "16:30",
             "home": "광주",
             "away": "안양",
-            "homeGoal": 0,
-            "awayGoal": 0,
-            "status": "예정",
+            "homeGoal": 2,
+            "awayGoal": 5,
+            "status": "종료",
             "venue": "광주 월드컵",
             "venueFull": "광주 월드컵 경기장",
             "round": 10,
             "ticketProvider": "T",
             "ticketStatus": null,
             "ticketYn": null,
-            "goodsCode": "198241494",
+            "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-04-21 11:00",
-            "ticketOpenDateSource": "ticketlink_api"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.05.02",
@@ -582,8 +625,8 @@
             "home": "안양",
             "away": "부천",
             "homeGoal": 0,
-            "awayGoal": 0,
-            "status": "예정",
+            "awayGoal": 1,
+            "status": "종료",
             "venue": "안양 종합",
             "venueFull": "안양 종합 운동장",
             "round": 11,
@@ -592,8 +635,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-04-28 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.05.05",
@@ -602,7 +645,7 @@
             "away": "안양",
             "homeGoal": 0,
             "awayGoal": 0,
-            "status": "예정",
+            "status": "종료",
             "venue": "서울 월드컵",
             "venueFull": "서울 월드컵 경기장",
             "round": 12,
@@ -611,8 +654,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-04-30 18:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.05.10",
@@ -628,10 +671,10 @@
             "ticketProvider": "T",
             "ticketStatus": null,
             "ticketYn": null,
-            "goodsCode": null,
+            "goodsCode": "990437409",
             "externalUrl": null,
             "ticketOpenDate": "2026-05-06 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDateSource": "ticketlink_api"
       },
       {
             "date": "2026.05.13",
@@ -649,8 +692,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-05-09 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.05.17",
@@ -668,8 +711,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-05-11 12:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.07.04",
@@ -687,8 +730,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-06-30 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.07.12",
@@ -706,8 +749,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-07-08 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.07.19",
@@ -725,8 +768,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-07-15 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.07.22",
@@ -744,8 +787,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-07-18 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.07.26",
@@ -763,8 +806,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-07-22 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.08.02",
@@ -782,8 +825,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-07-30 11:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.08.08",
@@ -801,8 +844,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-08-04 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.08.15",
@@ -820,8 +863,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-08-10 12:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.08.22",
@@ -839,8 +882,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-08-18 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.08.26",
@@ -858,8 +901,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-08-22 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.08.29",
@@ -877,8 +920,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-08-25 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.09.06",
@@ -896,8 +939,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-09-02 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.09.09",
@@ -915,8 +958,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": "",
-            "ticketOpenDate": "2026-09-04 13:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.09.13",
@@ -953,8 +996,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-09-15 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.10.10",
@@ -991,8 +1034,8 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-10-12 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.10.24",
@@ -1010,10 +1053,517 @@
             "ticketYn": null,
             "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-10-20 14:00",
-            "ticketOpenDateSource": "policy_rule"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       }
 ];
+
+    const roundProgress = {
+      "2025": [
+            {
+                  "year": 2025,
+                  "round": 1,
+                  "rank": 5,
+                  "points": 3,
+                  "win": 1,
+                  "draw": 0,
+                  "loss": 0,
+                  "games": 1
+            },
+            {
+                  "year": 2025,
+                  "round": 2,
+                  "rank": 8,
+                  "points": 3,
+                  "win": 1,
+                  "draw": 0,
+                  "loss": 1,
+                  "games": 2
+            },
+            {
+                  "year": 2025,
+                  "round": 3,
+                  "rank": 10,
+                  "points": 3,
+                  "win": 1,
+                  "draw": 0,
+                  "loss": 2,
+                  "games": 3
+            },
+            {
+                  "year": 2025,
+                  "round": 4,
+                  "rank": 11,
+                  "points": 3,
+                  "win": 1,
+                  "draw": 0,
+                  "loss": 3,
+                  "games": 4
+            },
+            {
+                  "year": 2025,
+                  "round": 5,
+                  "rank": 8,
+                  "points": 6,
+                  "win": 2,
+                  "draw": 0,
+                  "loss": 3,
+                  "games": 5
+            },
+            {
+                  "year": 2025,
+                  "round": 6,
+                  "rank": 11,
+                  "points": 6,
+                  "win": 2,
+                  "draw": 0,
+                  "loss": 4,
+                  "games": 6
+            },
+            {
+                  "year": 2025,
+                  "round": 7,
+                  "rank": 7,
+                  "points": 9,
+                  "win": 3,
+                  "draw": 0,
+                  "loss": 4,
+                  "games": 7
+            },
+            {
+                  "year": 2025,
+                  "round": 8,
+                  "rank": 9,
+                  "points": 9,
+                  "win": 3,
+                  "draw": 0,
+                  "loss": 5,
+                  "games": 8
+            },
+            {
+                  "year": 2025,
+                  "round": 9,
+                  "rank": 8,
+                  "points": 12,
+                  "win": 4,
+                  "draw": 0,
+                  "loss": 5,
+                  "games": 9
+            },
+            {
+                  "year": 2025,
+                  "round": 10,
+                  "rank": 5,
+                  "points": 15,
+                  "win": 5,
+                  "draw": 0,
+                  "loss": 5,
+                  "games": 10
+            },
+            {
+                  "year": 2025,
+                  "round": 11,
+                  "rank": 6,
+                  "points": 15,
+                  "win": 5,
+                  "draw": 0,
+                  "loss": 6,
+                  "games": 11
+            },
+            {
+                  "year": 2025,
+                  "round": 12,
+                  "rank": 7,
+                  "points": 16,
+                  "win": 5,
+                  "draw": 1,
+                  "loss": 6,
+                  "games": 12
+            },
+            {
+                  "year": 2025,
+                  "round": 13,
+                  "rank": 7,
+                  "points": 17,
+                  "win": 5,
+                  "draw": 2,
+                  "loss": 6,
+                  "games": 13
+            },
+            {
+                  "year": 2025,
+                  "round": 14,
+                  "rank": 9,
+                  "points": 17,
+                  "win": 5,
+                  "draw": 2,
+                  "loss": 7,
+                  "games": 14
+            },
+            {
+                  "year": 2025,
+                  "round": 15,
+                  "rank": 9,
+                  "points": 17,
+                  "win": 5,
+                  "draw": 2,
+                  "loss": 8,
+                  "games": 15
+            },
+            {
+                  "year": 2025,
+                  "round": 16,
+                  "rank": 9,
+                  "points": 20,
+                  "win": 6,
+                  "draw": 2,
+                  "loss": 8,
+                  "games": 16
+            },
+            {
+                  "year": 2025,
+                  "round": 17,
+                  "rank": 8,
+                  "points": 21,
+                  "win": 6,
+                  "draw": 3,
+                  "loss": 8,
+                  "games": 17
+            },
+            {
+                  "year": 2025,
+                  "round": 18,
+                  "rank": 7,
+                  "points": 24,
+                  "win": 7,
+                  "draw": 3,
+                  "loss": 8,
+                  "games": 18
+            },
+            {
+                  "year": 2025,
+                  "round": 19,
+                  "rank": 8,
+                  "points": 24,
+                  "win": 7,
+                  "draw": 3,
+                  "loss": 9,
+                  "games": 19
+            },
+            {
+                  "year": 2025,
+                  "round": 20,
+                  "rank": 9,
+                  "points": 24,
+                  "win": 7,
+                  "draw": 3,
+                  "loss": 10,
+                  "games": 20
+            },
+            {
+                  "year": 2025,
+                  "round": 21,
+                  "rank": 9,
+                  "points": 24,
+                  "win": 7,
+                  "draw": 3,
+                  "loss": 11,
+                  "games": 21
+            },
+            {
+                  "year": 2025,
+                  "round": 22,
+                  "rank": 10,
+                  "points": 24,
+                  "win": 7,
+                  "draw": 3,
+                  "loss": 12,
+                  "games": 22
+            },
+            {
+                  "year": 2025,
+                  "round": 23,
+                  "rank": 10,
+                  "points": 27,
+                  "win": 8,
+                  "draw": 3,
+                  "loss": 12,
+                  "games": 23
+            },
+            {
+                  "year": 2025,
+                  "round": 24,
+                  "rank": 11,
+                  "points": 27,
+                  "win": 8,
+                  "draw": 3,
+                  "loss": 13,
+                  "games": 24
+            },
+            {
+                  "year": 2025,
+                  "round": 25,
+                  "rank": 11,
+                  "points": 27,
+                  "win": 8,
+                  "draw": 3,
+                  "loss": 14,
+                  "games": 25
+            },
+            {
+                  "year": 2025,
+                  "round": 26,
+                  "rank": 11,
+                  "points": 27,
+                  "win": 8,
+                  "draw": 3,
+                  "loss": 15,
+                  "games": 26
+            },
+            {
+                  "year": 2025,
+                  "round": 27,
+                  "rank": 11,
+                  "points": 30,
+                  "win": 9,
+                  "draw": 3,
+                  "loss": 15,
+                  "games": 27
+            },
+            {
+                  "year": 2025,
+                  "round": 28,
+                  "rank": 9,
+                  "points": 33,
+                  "win": 10,
+                  "draw": 3,
+                  "loss": 15,
+                  "games": 28
+            },
+            {
+                  "year": 2025,
+                  "round": 29,
+                  "rank": 8,
+                  "points": 36,
+                  "win": 11,
+                  "draw": 3,
+                  "loss": 15,
+                  "games": 29
+            },
+            {
+                  "year": 2025,
+                  "round": 30,
+                  "rank": 8,
+                  "points": 37,
+                  "win": 11,
+                  "draw": 4,
+                  "loss": 15,
+                  "games": 30
+            },
+            {
+                  "year": 2025,
+                  "round": 31,
+                  "rank": 8,
+                  "points": 38,
+                  "win": 11,
+                  "draw": 5,
+                  "loss": 15,
+                  "games": 31
+            },
+            {
+                  "year": 2025,
+                  "round": 32,
+                  "rank": 8,
+                  "points": 39,
+                  "win": 11,
+                  "draw": 6,
+                  "loss": 15,
+                  "games": 32
+            },
+            {
+                  "year": 2025,
+                  "round": 33,
+                  "rank": 7,
+                  "points": 42,
+                  "win": 12,
+                  "draw": 6,
+                  "loss": 15,
+                  "games": 33
+            },
+            {
+                  "year": 2025,
+                  "round": 34,
+                  "rank": 8,
+                  "points": 42,
+                  "win": 12,
+                  "draw": 6,
+                  "loss": 16,
+                  "games": 34
+            },
+            {
+                  "year": 2025,
+                  "round": 35,
+                  "rank": 8,
+                  "points": 45,
+                  "win": 13,
+                  "draw": 6,
+                  "loss": 16,
+                  "games": 35
+            },
+            {
+                  "year": 2025,
+                  "round": 36,
+                  "rank": 7,
+                  "points": 48,
+                  "win": 14,
+                  "draw": 6,
+                  "loss": 16,
+                  "games": 36
+            },
+            {
+                  "year": 2025,
+                  "round": 37,
+                  "rank": 8,
+                  "points": 48,
+                  "win": 14,
+                  "draw": 6,
+                  "loss": 17,
+                  "games": 37
+            },
+            {
+                  "year": 2025,
+                  "round": 38,
+                  "rank": 8,
+                  "points": 49,
+                  "win": 14,
+                  "draw": 7,
+                  "loss": 17,
+                  "games": 38
+            }
+      ],
+      "2026": [
+            {
+                  "year": 2026,
+                  "round": 1,
+                  "rank": 6,
+                  "points": 1,
+                  "win": 0,
+                  "draw": 1,
+                  "loss": 0,
+                  "games": 1
+            },
+            {
+                  "year": 2026,
+                  "round": 2,
+                  "rank": 4,
+                  "points": 4,
+                  "win": 1,
+                  "draw": 1,
+                  "loss": 0,
+                  "games": 2
+            },
+            {
+                  "year": 2026,
+                  "round": 3,
+                  "rank": 3,
+                  "points": 5,
+                  "win": 1,
+                  "draw": 2,
+                  "loss": 0,
+                  "games": 3
+            },
+            {
+                  "year": 2026,
+                  "round": 4,
+                  "rank": 6,
+                  "points": 5,
+                  "win": 1,
+                  "draw": 2,
+                  "loss": 1,
+                  "games": 4
+            },
+            {
+                  "year": 2026,
+                  "round": 5,
+                  "rank": 9,
+                  "points": 5,
+                  "win": 1,
+                  "draw": 2,
+                  "loss": 2,
+                  "games": 5
+            },
+            {
+                  "year": 2026,
+                  "round": 6,
+                  "rank": 8,
+                  "points": 6,
+                  "win": 1,
+                  "draw": 3,
+                  "loss": 2,
+                  "games": 6
+            },
+            {
+                  "year": 2026,
+                  "round": 7,
+                  "rank": 8,
+                  "points": 7,
+                  "win": 1,
+                  "draw": 4,
+                  "loss": 2,
+                  "games": 7
+            },
+            {
+                  "year": 2026,
+                  "round": 8,
+                  "rank": 6,
+                  "points": 10,
+                  "win": 2,
+                  "draw": 4,
+                  "loss": 2,
+                  "games": 8
+            },
+            {
+                  "year": 2026,
+                  "round": 9,
+                  "rank": 7,
+                  "points": 11,
+                  "win": 2,
+                  "draw": 5,
+                  "loss": 2,
+                  "games": 9
+            },
+            {
+                  "year": 2026,
+                  "round": 10,
+                  "rank": 4,
+                  "points": 14,
+                  "win": 3,
+                  "draw": 5,
+                  "loss": 2,
+                  "games": 10
+            },
+            {
+                  "year": 2026,
+                  "round": 11,
+                  "rank": 7,
+                  "points": 14,
+                  "win": 3,
+                  "draw": 5,
+                  "loss": 3,
+                  "games": 11
+            },
+            {
+                  "year": 2026,
+                  "round": 12,
+                  "rank": 7,
+                  "points": 15,
+                  "win": 3,
+                  "draw": 6,
+                  "loss": 3,
+                  "games": 12
+            }
+      ]
+};
 
     const venueDistanceKm = {
       '안양 종합': 0.0,
@@ -1070,8 +1620,8 @@
             "pos": "DF",
             "birth": "1990/08/27",
             "nation": "한국",
-            "s2026": "6 / 0 / 0",
-            "career": "307 / 13 / 5"
+            "s2026": "9 / 0 / 0",
+            "career": "310 / 13 / 5"
       },
       {
             "no": 5,
@@ -1079,8 +1629,8 @@
             "pos": "DF",
             "birth": "1993/09/04",
             "nation": "한국",
-            "s2026": "8 / 1 / 0",
-            "career": "227 / 4 / 4"
+            "s2026": "10 / 1 / 0",
+            "career": "229 / 4 / 4"
       },
       {
             "no": 6,
@@ -1097,8 +1647,8 @@
             "pos": "MF",
             "birth": "1997/09/28",
             "nation": "브라질",
-            "s2026": "9 / 3 / 3",
-            "career": "80 / 20 / 19"
+            "s2026": "11 / 3 / 3",
+            "career": "82 / 20 / 19"
       },
       {
             "no": 8,
@@ -1106,8 +1656,8 @@
             "pos": "MF",
             "birth": "1993/06/01",
             "nation": "한국",
-            "s2026": "7 / 0 / 0",
-            "career": "209 / 14 / 5"
+            "s2026": "10 / 1 / 0",
+            "career": "212 / 15 / 5"
       },
       {
             "no": 9,
@@ -1115,8 +1665,8 @@
             "pos": "FW",
             "birth": "1999/02/16",
             "nation": "브라질",
-            "s2026": "7 / 0 / 1",
-            "career": "7 / 0 / 1"
+            "s2026": "10 / 1 / 2",
+            "career": "10 / 1 / 2"
       },
       {
             "no": 10,
@@ -1133,8 +1683,8 @@
             "pos": "FW",
             "birth": "1999/02/02",
             "nation": "브라질",
-            "s2026": "8 / 2 / 0",
-            "career": "8 / 2 / 0"
+            "s2026": "11 / 3 / 0",
+            "career": "11 / 3 / 0"
       },
       {
             "no": 13,
@@ -1142,8 +1692,8 @@
             "pos": "MF",
             "birth": "1998/02/09",
             "nation": "한국",
-            "s2026": "5 / 0 / 0",
-            "career": "25 / 1 / 0"
+            "s2026": "7 / 0 / 0",
+            "career": "27 / 1 / 0"
       },
       {
             "no": 14,
@@ -1160,8 +1710,8 @@
             "pos": "FW",
             "birth": "2004/08/21",
             "nation": "한국",
-            "s2026": "3 / 0 / 0",
-            "career": "17 / 0 / 0"
+            "s2026": "6 / 0 / 1",
+            "career": "20 / 0 / 1"
       },
       {
             "no": 16,
@@ -1169,8 +1719,8 @@
             "pos": "MF",
             "birth": "2000/09/19",
             "nation": "한국",
-            "s2026": "3 / 0 / 0",
-            "career": "45 / 3 / 0"
+            "s2026": "4 / 0 / 0",
+            "career": "46 / 3 / 0"
       },
       {
             "no": 17,
@@ -1178,8 +1728,8 @@
             "pos": "MF",
             "birth": "1997/01/06",
             "nation": "한국",
-            "s2026": "5 / 0 / 0",
-            "career": "130 / 5 / 5"
+            "s2026": "6 / 0 / 1",
+            "career": "131 / 5 / 6"
       },
       {
             "no": 19,
@@ -1187,8 +1737,8 @@
             "pos": "FW",
             "birth": "1994/11/15",
             "nation": "한국",
-            "s2026": "6 / 1 / 1",
-            "career": "60 / 5 / 3"
+            "s2026": "9 / 2 / 2",
+            "career": "63 / 6 / 4"
       },
       {
             "no": 20,
@@ -1205,8 +1755,8 @@
             "pos": "DF",
             "birth": "1992/01/31",
             "nation": "한국",
-            "s2026": "7 / 0 / 0",
-            "career": "119 / 5 / 3"
+            "s2026": "9 / 0 / 0",
+            "career": "121 / 5 / 3"
       },
       {
             "no": 22,
@@ -1214,8 +1764,8 @@
             "pos": "DF",
             "birth": "1992/12/28",
             "nation": "한국",
-            "s2026": "9 / 0 / 0",
-            "career": "307 / 16 / 16"
+            "s2026": "11 / 0 / 0",
+            "career": "309 / 16 / 16"
       },
       {
             "no": 23,
@@ -1223,8 +1773,8 @@
             "pos": "GK",
             "birth": "2001/04/20",
             "nation": "한국",
-            "s2026": "8 / 8 / 1",
-            "career": "55 / 52 / 13"
+            "s2026": "11 / 11 / 2",
+            "career": "58 / 55 / 14"
       },
       {
             "no": 24,
@@ -1259,8 +1809,8 @@
             "pos": "FW",
             "birth": "1999/06/26",
             "nation": "한국",
-            "s2026": "9 / 2 / 0",
-            "career": "168 / 22 / 8"
+            "s2026": "11 / 2 / 0",
+            "career": "170 / 22 / 8"
       },
       {
             "no": 31,
@@ -1277,8 +1827,8 @@
             "pos": "DF",
             "birth": "1992/06/16",
             "nation": "한국",
-            "s2026": "8 / 0 / 0",
-            "career": "274 / 8 / 20"
+            "s2026": "11 / 0 / 0",
+            "career": "277 / 8 / 20"
       },
       {
             "no": 37,
@@ -1313,8 +1863,8 @@
             "pos": "MF",
             "birth": "1999/03/17",
             "nation": "스웨덴",
-            "s2026": "- / - / -",
-            "career": "- / - / -"
+            "s2026": "3 / 0 / 0",
+            "career": "3 / 0 / 0"
       },
       {
             "no": 47,
@@ -1322,8 +1872,8 @@
             "pos": "MF",
             "birth": "2007/07/05",
             "nation": "한국",
-            "s2026": "- / - / -",
-            "career": "- / - / -"
+            "s2026": "2 / 0 / 0",
+            "career": "2 / 0 / 0"
       },
       {
             "no": 55,
@@ -1331,8 +1881,8 @@
             "pos": "DF",
             "birth": "1996/03/20",
             "nation": "네덜란드",
-            "s2026": "9 / 0 / 0",
-            "career": "46 / 3 / 2"
+            "s2026": "11 / 1 / 0",
+            "career": "48 / 4 / 2"
       },
       {
             "no": 70,
@@ -1349,8 +1899,8 @@
             "pos": "FW",
             "birth": "2004/08/19",
             "nation": "한국",
-            "s2026": "4 / 0 / 0",
-            "career": "63 / 7 / 0"
+            "s2026": "6 / 0 / 0",
+            "career": "65 / 7 / 0"
       },
       {
             "no": 77,
@@ -1367,8 +1917,8 @@
             "pos": "DF",
             "birth": "1990/09/12",
             "nation": "한국",
-            "s2026": "- / - / -",
-            "career": "307 / 10 / 36"
+            "s2026": "1 / 0 / 0",
+            "career": "308 / 10 / 36"
       }
 ];
 
@@ -1379,6 +1929,73 @@
       tr.innerHTML = `<td>${row.rank}</td><td>${row.club}</td><td>${row.games}</td><td>${row.points}</td><td>${row.win}</td><td>${row.draw}</td><td>${row.loss}</td><td>${row.goals}</td><td>${row.against}</td><td>${row.diff}</td>`;
       rankingBody.appendChild(tr);
     });
+
+    function renderRankTrend() {
+      const chart = document.getElementById('rankTrendChart');
+      const summary = document.getElementById('rankTrendSummary');
+      if (!chart || !summary) return;
+
+      const series = [
+        { year: '2026', className: 'current', rows: roundProgress['2026'] || [] },
+        { year: '2025', className: 'previous', rows: roundProgress['2025'] || [] },
+      ];
+      const allRows = series.flatMap(s => s.rows);
+      if (!allRows.length) {
+        chart.innerHTML = '<div class="small" style="padding:16px">순위 추이 데이터 확인중</div>';
+        summary.innerHTML = '';
+        return;
+      }
+
+      const width = 720;
+      const height = 320;
+      const pad = { left: 42, right: 18, top: 22, bottom: 34 };
+      const maxRound = Math.max(...allRows.map(d => d.round));
+      const minRound = Math.min(...allRows.map(d => d.round));
+      const maxRank = 12;
+      const x = round => pad.left + ((round - minRound) / Math.max(1, maxRound - minRound)) * (width - pad.left - pad.right);
+      const y = rank => pad.top + ((rank - 1) / Math.max(1, maxRank - 1)) * (height - pad.top - pad.bottom);
+      const roundTicks = Array.from(new Set([1, 5, 10, 15, 20, 25, 30, maxRound].filter(v => v >= minRound && v <= maxRound)));
+      const rankTicks = [1, 3, 6, 9, 12];
+
+      const grid = [
+        ...rankTicks.map(t => `<line class="trend-grid-line" x1="${pad.left}" y1="${y(t)}" x2="${width - pad.right}" y2="${y(t)}"></line><text class="trend-label" x="12" y="${y(t) + 4}">${t}위</text>`),
+        ...roundTicks.map(t => `<line class="trend-grid-line" x1="${x(t)}" y1="${pad.top}" x2="${x(t)}" y2="${height - pad.bottom}"></line><text class="trend-label" x="${x(t) - 8}" y="${height - 10}">R${t}</text>`),
+      ].join('');
+
+      const paths = series.map(s => {
+        const rows = [...s.rows].sort((a, b) => a.round - b.round);
+        if (!rows.length) return '';
+        const d = rows.map((row, idx) => `${idx === 0 ? 'M' : 'L'} ${x(row.round).toFixed(1)} ${y(row.rank).toFixed(1)}`).join(' ');
+        const points = rows.map(row => `
+          <circle class="trend-point ${s.className}" cx="${x(row.round).toFixed(1)}" cy="${y(row.rank).toFixed(1)}" r="4">
+            <title>${s.year} R${row.round}: ${row.rank}위 · ${row.points}점 · ${row.win}승 ${row.draw}무 ${row.loss}패</title>
+          </circle>
+        `).join('');
+        return `<path class="trend-line ${s.className}" d="${d}"></path>${points}`;
+      }).join('');
+
+      chart.innerHTML = `
+        <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="라운드별 순위 추이">
+          ${grid}
+          <line class="trend-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${height - pad.bottom}"></line>
+          <line class="trend-axis" x1="${pad.left}" y1="${height - pad.bottom}" x2="${width - pad.right}" y2="${height - pad.bottom}"></line>
+          ${paths}
+        </svg>
+      `;
+
+      summary.innerHTML = series.map(s => {
+        const latest = [...s.rows].sort((a, b) => a.round - b.round).at(-1);
+        if (!latest) return '';
+        return `
+          <div class="trend-card">
+            <strong>${s.year} 최신 R${latest.round} · ${latest.rank}위</strong>
+            <div class="mono">${latest.points}점 · ${latest.win}승 ${latest.draw}무 ${latest.loss}패</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    renderRankTrend();
 
     const anyangRank = ranking.find(r => r.club === '안양');
     if (anyangRank) {
@@ -1436,13 +2053,6 @@
       const ticketUrl = getTicketUrl(match);
 
       if (match.ticketOpenDate) {
-        if (match.ticketOpenDateSource === 'policy_rule') {
-          return {
-            badge: { text: `예매예정 ${match.ticketOpenDate}`, className: 'pending', url: ticketUrl },
-            openDate: null,
-            openDateUrl: '',
-          };
-        }
         return {
           badge: { text: `예매 오픈 ${match.ticketOpenDate}`, className: 'upcoming', url: ticketUrl },
           openDate: match.ticketOpenDate,

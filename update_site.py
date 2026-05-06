@@ -57,41 +57,141 @@ def fetch_ranking():
     return rows
 
 
-def fetch_schedule():
+def fetch_league_schedule(year, team_id=None):
     all_rows = []
     for month in range(1, 13):
-        payload = {'leagueId': 1, 'teamId': 'K27', 'year': '2026', 'month': f'{month:02d}', 'ticketYn': ''}
+        payload = {'leagueId': 1, 'year': str(year), 'month': f'{month:02d}', 'ticketYn': ''}
+        if team_id:
+            payload['teamId'] = team_id
         obj = get_json('https://www.kleague.com/getScheduleList.do', payload)
         for item in obj['data']['scheduleList']:
-            status = '종료' if item.get('gameStatus') == 'FE' or item.get('endYn') == 'Y' else '예정'
-            all_rows.append({
-                'date': item['gameDate'],
-                'time': item['gameTime'],
-                'home': item['homeTeamName'],
-                'away': item['awayTeamName'],
-                'homeGoal': item.get('homeGoal'),
-                'awayGoal': item.get('awayGoal'),
-                'status': status,
-                'venue': item['fieldName'],
-                'venueFull': item.get('fieldNameFull') or item['fieldName'],
-                'round': item['roundId'],
-                'ticketProvider': item.get('company'),
-                'ticketStatus': item.get('ticketStatus'),
-                'ticketYn': item.get('ticketYn'),
-                'goodsCode': item.get('goodsCode'),
-                'externalUrl': item.get('externalUrl'),
-                'ticketOpenDate': None,
-                'ticketOpenDateSource': None,
-            })
+            all_rows.append(item)
+
     deduped = []
     seen = set()
-    for row in all_rows:
-        key = (row['date'], row['time'], row['home'], row['away'])
+    for item in all_rows:
+        key = (item.get('year'), item.get('roundId'), item.get('gameId'), item.get('homeTeam'), item.get('awayTeam'))
         if key not in seen:
             seen.add(key)
-            deduped.append(row)
-    deduped.sort(key=lambda x: (x['date'], x['time']))
+            deduped.append(item)
+    deduped.sort(key=lambda x: (x.get('gameDate', ''), x.get('gameTime', ''), x.get('gameId') or 0))
     return deduped
+
+
+def fetch_schedule():
+    all_rows = []
+    for item in fetch_league_schedule(2026, team_id='K27'):
+        status = '종료' if item.get('gameStatus') == 'FE' or item.get('endYn') == 'Y' else '예정'
+        all_rows.append({
+            'date': item['gameDate'],
+            'time': item['gameTime'],
+            'home': item['homeTeamName'],
+            'away': item['awayTeamName'],
+            'homeGoal': item.get('homeGoal'),
+            'awayGoal': item.get('awayGoal'),
+            'status': status,
+            'venue': item['fieldName'],
+            'venueFull': item.get('fieldNameFull') or item['fieldName'],
+            'round': item['roundId'],
+            'ticketProvider': item.get('company'),
+            'ticketStatus': item.get('ticketStatus'),
+            'ticketYn': item.get('ticketYn'),
+            'goodsCode': item.get('goodsCode'),
+            'externalUrl': item.get('externalUrl'),
+            'ticketOpenDate': None,
+            'ticketOpenDateSource': None,
+        })
+    all_rows.sort(key=lambda x: (x['date'], x['time']))
+    return all_rows
+
+
+def fetch_round_progress(year):
+    """라운드 종료 시점별 FC안양 순위/승점/승무패 추이를 계산합니다."""
+    matches = [
+        item for item in fetch_league_schedule(year)
+        if (item.get('gameStatus') == 'FE' or item.get('endYn') == 'Y') and item.get('meetSeq') == 1
+    ]
+    teams = {}
+    for item in matches:
+        teams[item['homeTeam']] = item['homeTeamName']
+        teams[item['awayTeam']] = item['awayTeamName']
+
+    table = {
+        team_id: {'teamId': team_id, 'club': club, 'points': 0, 'win': 0, 'draw': 0, 'loss': 0, 'goals': 0, 'against': 0, 'diff': 0, 'games': 0}
+        for team_id, club in teams.items()
+    }
+
+    progress = []
+    split_top_ids = None
+    rounds = sorted({int(item['roundId']) for item in matches if item.get('roundId') is not None})
+    for round_id in rounds:
+        round_matches = [item for item in matches if int(item['roundId']) == round_id]
+        # 완전히 끝난 라운드만 순위 추이에 반영
+        if len(round_matches) < max(1, len(teams) // 2):
+            continue
+
+        for item in sorted(round_matches, key=lambda x: (x.get('gameDate', ''), x.get('gameTime', ''), x.get('gameId') or 0)):
+            home = table[item['homeTeam']]
+            away = table[item['awayTeam']]
+            home_goal = int(item.get('homeGoal') or 0)
+            away_goal = int(item.get('awayGoal') or 0)
+
+            home['games'] += 1
+            away['games'] += 1
+            home['goals'] += home_goal
+            home['against'] += away_goal
+            away['goals'] += away_goal
+            away['against'] += home_goal
+            home['diff'] = home['goals'] - home['against']
+            away['diff'] = away['goals'] - away['against']
+
+            if home_goal > away_goal:
+                home['win'] += 1
+                home['points'] += 3
+                away['loss'] += 1
+            elif home_goal < away_goal:
+                away['win'] += 1
+                away['points'] += 3
+                home['loss'] += 1
+            else:
+                home['draw'] += 1
+                away['draw'] += 1
+                home['points'] += 1
+                away['points'] += 1
+
+        base_ranked = sorted(
+            table.values(),
+            key=lambda r: (-r['points'], -r['diff'], -r['goals'], -r['win'], r['club'])
+        )
+
+        # K리그는 33R 이후 파이널A/B 그룹 순위가 고정되어 서로 순위를 넘지 않습니다.
+        if round_id == 33 and len(base_ranked) >= 12:
+            split_top_ids = {row['teamId'] for row in base_ranked[:6]}
+
+        if split_top_ids and round_id >= 34:
+            top_group = [row for row in base_ranked if row['teamId'] in split_top_ids]
+            bottom_group = [row for row in base_ranked if row['teamId'] not in split_top_ids]
+            ranked = top_group + bottom_group
+        else:
+            ranked = base_ranked
+
+        for idx, row in enumerate(ranked, start=1):
+            row['rank'] = idx
+
+        anyang = next((row for row in ranked if row['club'] == '안양'), None)
+        if anyang:
+            progress.append({
+                'year': year,
+                'round': round_id,
+                'rank': anyang['rank'],
+                'points': anyang['points'],
+                'win': anyang['win'],
+                'draw': anyang['draw'],
+                'loss': anyang['loss'],
+                'games': anyang['games'],
+            })
+
+    return progress
 
 
 def load_ticket_policy_rules():
@@ -311,11 +411,7 @@ def merge_ticket_data(schedule, ticket_map, policy_rules):
                 match['ticketOpenDateSource'] = 'ticketlink_api'
                 continue
 
-        # 정책 룰 보완
-        policy_open = apply_policy_open_date(match, policy_rules)
-        if policy_open:
-            match['ticketOpenDate'] = policy_open
-            match['ticketOpenDateSource'] = 'policy_rule'
+        # 정책 룰 기반 추정값은 표시하지 않음: 직접 확인된 OCR/API 값만 반영
 
     return schedule
 
@@ -402,10 +498,14 @@ def fetch_players():
     return out
 
 
-def replace_const_array(text, const_name, data):
+def replace_const_json(text, const_name, data):
     replacement = f"const {const_name} = {json.dumps(data, ensure_ascii=False, indent=6)};"
-    pattern = rf'const {const_name} = \[(?:.*?)\];'
+    pattern = rf'const {const_name} = (?:\{{.*?\}}|\[(?:.*?)\]);'
     return re.sub(pattern, lambda m: replacement, text, flags=re.S)
+
+
+def replace_const_array(text, const_name, data):
+    return replace_const_json(text, const_name, data)
 
 
 def main():
@@ -414,11 +514,16 @@ def main():
     ticket_map = fetch_ticket_schedule()
     policy_rules = load_ticket_policy_rules()
     schedule = merge_ticket_data(schedule, ticket_map, policy_rules)
+    round_progress = {
+        '2025': fetch_round_progress(2025),
+        '2026': fetch_round_progress(2026),
+    }
     players = fetch_players()
 
     text = HTML_PATH.read_text(encoding='utf-8')
     text = replace_const_array(text, 'ranking', ranking)
     text = replace_const_array(text, 'schedule', schedule)
+    text = replace_const_json(text, 'roundProgress', round_progress)
     text = replace_const_array(text, 'players', players)
     kst = timezone(timedelta(hours=9))
     today = datetime.now(kst).strftime('%Y-%m-%d %H:%M KST')
@@ -433,6 +538,7 @@ def main():
         'ranking_rows': len(ranking),
         'schedule_rows': len(schedule),
         'player_rows': len(players),
+        'round_progress_years': {year: len(rows) for year, rows in round_progress.items()},
         'ticket_on_sale': ticket_on_sale,
         'ticket_open_date_known': ticket_open,
     }, ensure_ascii=False, indent=2))
