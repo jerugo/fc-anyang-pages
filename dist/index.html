@@ -2072,11 +2072,15 @@
         };
       }
 
-      return {
-        badge: { text: '예매일자 확인중', className: 'pending', url: '' },
-        openDate: null,
-        openDateUrl: '',
-      };
+      if (match === nextMatch) {
+        return {
+          badge: { text: '예매일자 확인중', className: 'pending', url: '' },
+          openDate: null,
+          openDateUrl: '',
+        };
+      }
+
+      return { badge: null, openDate: null, openDateUrl: '' };
     }
 
     function renderMonthOptions() {
