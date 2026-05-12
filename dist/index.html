@@ -207,7 +207,7 @@
       <div class="section-head">
         <div>
           <h2 class="section-title">라운드별 순위 추이</h2>
-          <p>작년과 올해 FC안양 순위, 승점, 승/무/패 비교</p>
+          <p>올해 현재 라운드 기준 작년 동일 라운드 성적과 최종 성적 비교</p>
         </div>
       </div>
       <div class="card panel">
@@ -1983,13 +1983,25 @@
         </svg>
       `;
 
-      summary.innerHTML = series.map(s => {
-        const latest = [...s.rows].sort((a, b) => a.round - b.round).at(-1);
+      const currentLatest = [...(roundProgress['2026'] || [])].sort((a, b) => a.round - b.round).at(-1);
+      const previousRows = [...(roundProgress['2025'] || [])].sort((a, b) => a.round - b.round);
+      const previousSameRound = currentLatest
+        ? previousRows.find(row => row.round === currentLatest.round)
+        : null;
+      const previousLatest = previousRows.at(-1);
+      const summaryRows = [
+        { label: '2026 현재', row: currentLatest },
+        { label: currentLatest ? `2025 동일 R${currentLatest.round}` : '2025 동일 라운드', row: previousSameRound },
+        { label: '2025 최종', row: previousLatest },
+      ];
+
+      summary.innerHTML = summaryRows.map(item => {
+        const latest = item.row;
         if (!latest) return '';
         return `
           <div class="trend-card">
-            <strong>${s.year} 최신 R${latest.round} · ${latest.rank}위</strong>
-            <div class="mono">${latest.points}점 · ${latest.win}승 ${latest.draw}무 ${latest.loss}패</div>
+            <strong>${item.label} · ${latest.rank}위</strong>
+            <div class="mono">R${latest.round} · ${latest.points}점 · ${latest.win}승 ${latest.draw}무 ${latest.loss}패</div>
           </div>
         `;
       }).join('');
