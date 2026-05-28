@@ -3,6 +3,7 @@ import hashlib
 import html as html_lib
 import json
 import re
+import subprocess
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -276,12 +277,33 @@ def parse_fmkorea_rumor_items(page_html):
     return items
 
 
+def fetch_text_with_curl(url, headers=None):
+    cmd = [
+        'curl', '-fsSL', '--http1.1', '--tlsv1.2', '--ciphers', 'DEFAULT@SECLEVEL=1',
+        '-A', (headers or {}).get('User-Agent', 'Mozilla/5.0'),
+    ]
+    for key, value in (headers or {}).items():
+        if key.lower() != 'user-agent':
+            cmd.extend(['-H', f'{key}: {value}'])
+    cmd.append(url)
+    result = subprocess.run(cmd, check=True, capture_output=True, timeout=30)
+    for enc in ('utf-8', 'cp949', 'euc-kr'):
+        try:
+            return result.stdout.decode(enc)
+        except UnicodeDecodeError:
+            pass
+    return result.stdout.decode('utf-8', errors='replace')
+
+
 def fetch_text(url, headers=None):
-    r = requests.get(url, headers=headers or {'User-Agent': 'Mozilla/5.0'}, timeout=30)
-    r.raise_for_status()
-    if r.encoding is None or r.encoding.lower() in ('iso-8859-1', 'latin-1'):
-        r.encoding = r.apparent_encoding or 'utf-8'
-    return r.text
+    try:
+        r = requests.get(url, headers=headers or {'User-Agent': 'Mozilla/5.0'}, timeout=30)
+        r.raise_for_status()
+        if r.encoding is None or r.encoding.lower() in ('iso-8859-1', 'latin-1'):
+            r.encoding = r.apparent_encoding or 'utf-8'
+        return r.text
+    except requests.exceptions.SSLError:
+        return fetch_text_with_curl(url, headers=headers)
 
 
 def fetch_recent_news(days=7):
