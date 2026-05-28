@@ -116,6 +116,22 @@
     .players-wrap { max-height: 720px; overflow: auto; border-radius: 16px; border: 1px solid var(--border); }
     .players-wrap table { min-width: 860px; }
     .players-wrap th:nth-child(3), .players-wrap td:nth-child(3) { width: 42px; min-width: 42px; max-width: 42px; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
+
+    .news-grid { display:grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr); gap:14px; }
+    .news-list { display:grid; gap:10px; }
+    .news-card { display:block; padding: 13px; border: 1px solid var(--border-soft); border-radius: 14px; background: rgba(255,255,255,.02); text-decoration:none; }
+    .news-card:hover { background: rgba(255,255,255,.04); border-color: rgba(155,92,255,.24); }
+    .news-card-top { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:7px; }
+    .news-title { font-weight:700; line-height:1.35; letter-spacing:-.2px; }
+    .news-meta { margin-top:6px; color: var(--text-3); font-size:12px; }
+    .badge { font-size:11px; padding:5px 8px; border-radius:999px; border:1px solid var(--border); color:var(--text-2); white-space:nowrap; }
+    .badge.official { background:rgba(16,185,129,.10); border-color:rgba(16,185,129,.26); color:#7bf0bf; }
+    .badge.sns { background:rgba(56,189,248,.10); border-color:rgba(56,189,248,.26); color:#93e5ff; }
+    .badge.rumor { background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.30); color:#ffd081; }
+    .rumor-note { padding: 12px; border-radius: 14px; background: rgba(245,158,11,.09); border:1px solid rgba(245,158,11,.20); color:#f8d99b; font-size:12px; line-height:1.55; margin-bottom:10px; }
+    .keyword-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .keyword-chip { font-size:11px; padding:4px 7px; border-radius:999px; background:rgba(255,255,255,.05); color:var(--text-2); }
+    .empty-state { padding:14px; border:1px dashed var(--border); border-radius:14px; color:var(--text-3); font-size:13px; }
     .right { text-align:right; }
     footer { padding: 18px 0 36px; color: var(--text-3); }
     @media (max-width: 980px) {
@@ -132,7 +148,7 @@
       th, td { padding: 10px 8px; font-size: 13px; }
       .input { min-width: 100%; }
       .players-wrap { max-height: none; }
-      .trend-grid { grid-template-columns: 1fr; }
+      .trend-grid, .news-grid { grid-template-columns: 1fr; }
       .trend-chart svg { height: 280px; }
       .schedule-scroll { max-height: 60vh; }
     }
@@ -148,7 +164,7 @@
           <div class="small mono">fc-anyang all-in-one dashboard</div>
         </div>
       </div>
-      <div class="small">업데이트 기준: <span id="updateDateText">2026-05-06 16:39 KST</span></div>
+      <div class="small">업데이트 기준: <span id="updateDateText">2026-05-28 17:52 KST</span></div>
     </div>
   </header>
 
@@ -199,6 +215,27 @@
             <button id="nextMonthBtn" class="btn-toggle">▶</button>
           </div>
           <div class="month-grid" id="calendarGrid"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">최근 소식 · 팬 커뮤니티 루머</h2>
+          <p>최근 1주일 기준. 루머는 공식 소식과 분리해 표시합니다.</p>
+        </div>
+      </div>
+      <div class="news-grid">
+        <div class="card panel">
+          <h3 class="section-title">공식 소식 / 이벤트 / 영상</h3>
+          <div id="recentNewsList" class="news-list"></div>
+        </div>
+        <div class="card panel">
+          <h3 class="section-title">팬 커뮤니티 루머</h3>
+          <div class="rumor-note">공식 발표가 아닌 커뮤니티 게시글 기반의 비공식 정보입니다. 사실 여부는 공식 발표 전까지 확인되지 않습니다.</div>
+          <div id="communityRumorList" class="news-list"></div>
         </div>
       </div>
     </section>
@@ -285,146 +322,146 @@
       {
             "rank": 1,
             "club": "서울",
-            "games": 12,
-            "points": 26,
-            "win": 8,
+            "games": 15,
+            "points": 32,
+            "win": 10,
             "draw": 2,
-            "loss": 2,
-            "goals": 23,
-            "against": 9,
-            "diff": 14
+            "loss": 3,
+            "goals": 27,
+            "against": 12,
+            "diff": 15
       },
       {
             "rank": 2,
-            "club": "전북",
-            "games": 12,
-            "points": 21,
-            "win": 6,
-            "draw": 3,
-            "loss": 3,
-            "goals": 19,
-            "against": 11,
-            "diff": 8
+            "club": "울산",
+            "games": 15,
+            "points": 26,
+            "win": 8,
+            "draw": 2,
+            "loss": 5,
+            "goals": 22,
+            "against": 20,
+            "diff": 2
       },
       {
             "rank": 3,
-            "club": "울산",
-            "games": 12,
-            "points": 20,
-            "win": 6,
-            "draw": 2,
-            "loss": 4,
-            "goals": 19,
-            "against": 17,
-            "diff": 2
+            "club": "전북",
+            "games": 15,
+            "points": 26,
+            "win": 7,
+            "draw": 5,
+            "loss": 3,
+            "goals": 21,
+            "against": 12,
+            "diff": 9
       },
       {
             "rank": 4,
             "club": "강원",
-            "games": 12,
-            "points": 17,
-            "win": 4,
-            "draw": 5,
+            "games": 15,
+            "points": 24,
+            "win": 6,
+            "draw": 6,
             "loss": 3,
-            "goals": 15,
+            "goals": 19,
             "against": 10,
-            "diff": 5
+            "diff": 9
       },
       {
             "rank": 5,
-            "club": "대전",
-            "games": 12,
-            "points": 16,
-            "win": 4,
+            "club": "포항",
+            "games": 15,
+            "points": 22,
+            "win": 6,
             "draw": 4,
-            "loss": 4,
-            "goals": 16,
-            "against": 10,
-            "diff": 6
+            "loss": 5,
+            "goals": 12,
+            "against": 12,
+            "diff": 0
       },
       {
             "rank": 6,
-            "club": "포항",
-            "games": 12,
-            "points": 16,
-            "win": 4,
-            "draw": 4,
-            "loss": 4,
-            "goals": 9,
-            "against": 10,
-            "diff": -1
+            "club": "인천",
+            "games": 15,
+            "points": 21,
+            "win": 6,
+            "draw": 3,
+            "loss": 6,
+            "goals": 21,
+            "against": 17,
+            "diff": 4
       },
       {
             "rank": 7,
             "club": "안양",
-            "games": 12,
-            "points": 15,
-            "win": 3,
-            "draw": 6,
+            "games": 15,
+            "points": 20,
+            "win": 4,
+            "draw": 8,
             "loss": 3,
-            "goals": 14,
-            "against": 12,
-            "diff": 2
+            "goals": 19,
+            "against": 16,
+            "diff": 3
       },
       {
             "rank": 8,
-            "club": "인천",
-            "games": 12,
-            "points": 15,
-            "win": 4,
+            "club": "제주",
+            "games": 15,
+            "points": 18,
+            "win": 5,
             "draw": 3,
-            "loss": 5,
-            "goals": 14,
+            "loss": 7,
+            "goals": 13,
             "against": 16,
-            "diff": -2
+            "diff": -3
       },
       {
             "rank": 9,
-            "club": "제주",
-            "games": 12,
-            "points": 15,
+            "club": "부천",
+            "games": 15,
+            "points": 17,
             "win": 4,
-            "draw": 3,
-            "loss": 5,
-            "goals": 9,
-            "against": 11,
-            "diff": -2
+            "draw": 5,
+            "loss": 6,
+            "goals": 11,
+            "against": 15,
+            "diff": -4
       },
       {
             "rank": 10,
-            "club": "김천",
-            "games": 12,
-            "points": 13,
-            "win": 2,
-            "draw": 7,
-            "loss": 3,
-            "goals": 13,
-            "against": 15,
-            "diff": -2
+            "club": "대전",
+            "games": 15,
+            "points": 16,
+            "win": 4,
+            "draw": 4,
+            "loss": 7,
+            "goals": 17,
+            "against": 16,
+            "diff": 1
       },
       {
             "rank": 11,
-            "club": "부천",
-            "games": 12,
-            "points": 13,
-            "win": 3,
-            "draw": 4,
+            "club": "김천",
+            "games": 15,
+            "points": 14,
+            "win": 2,
+            "draw": 8,
             "loss": 5,
-            "goals": 9,
-            "against": 14,
-            "diff": -5
+            "goals": 15,
+            "against": 21,
+            "diff": -6
       },
       {
             "rank": 12,
             "club": "광주",
-            "games": 12,
-            "points": 6,
+            "games": 15,
+            "points": 7,
             "win": 1,
-            "draw": 3,
-            "loss": 8,
+            "draw": 4,
+            "loss": 10,
             "goals": 7,
-            "against": 32,
-            "diff": -25
+            "against": 37,
+            "diff": -30
       }
 ];
 
@@ -662,28 +699,28 @@
             "time": "16:30",
             "home": "안양",
             "away": "전북",
-            "homeGoal": 0,
-            "awayGoal": 0,
-            "status": "예정",
+            "homeGoal": 1,
+            "awayGoal": 1,
+            "status": "종료",
             "venue": "안양 종합",
             "venueFull": "안양 종합 운동장",
             "round": 13,
             "ticketProvider": "T",
             "ticketStatus": null,
             "ticketYn": null,
-            "goodsCode": "990437409",
+            "goodsCode": null,
             "externalUrl": null,
-            "ticketOpenDate": "2026-05-06 14:00",
-            "ticketOpenDateSource": "ticketlink_api"
+            "ticketOpenDate": null,
+            "ticketOpenDateSource": null
       },
       {
             "date": "2026.05.13",
             "time": "19:30",
             "home": "안양",
             "away": "김천",
-            "homeGoal": 0,
-            "awayGoal": 0,
-            "status": "예정",
+            "homeGoal": 2,
+            "awayGoal": 2,
+            "status": "종료",
             "venue": "안양 종합",
             "venueFull": "안양 종합 운동장",
             "round": 14,
@@ -700,9 +737,9 @@
             "time": "16:30",
             "home": "제주",
             "away": "안양",
-            "homeGoal": 0,
-            "awayGoal": 0,
-            "status": "예정",
+            "homeGoal": 1,
+            "awayGoal": 2,
+            "status": "종료",
             "venue": "제주 월드컵",
             "venueFull": "제주 월드컵 경기장",
             "round": 15,
@@ -1561,6 +1598,36 @@
                   "draw": 6,
                   "loss": 3,
                   "games": 12
+            },
+            {
+                  "year": 2026,
+                  "round": 13,
+                  "rank": 9,
+                  "points": 16,
+                  "win": 3,
+                  "draw": 7,
+                  "loss": 3,
+                  "games": 13
+            },
+            {
+                  "year": 2026,
+                  "round": 14,
+                  "rank": 8,
+                  "points": 17,
+                  "win": 3,
+                  "draw": 8,
+                  "loss": 3,
+                  "games": 14
+            },
+            {
+                  "year": 2026,
+                  "round": 15,
+                  "rank": 7,
+                  "points": 20,
+                  "win": 4,
+                  "draw": 8,
+                  "loss": 3,
+                  "games": 15
             }
       ]
 };
@@ -1611,8 +1678,8 @@
             "pos": "DF",
             "birth": "2004/10/14",
             "nation": "한국",
-            "s2026": "3 / 0 / 0",
-            "career": "11 / 0 / 0"
+            "s2026": "5 / 0 / 0",
+            "career": "13 / 0 / 0"
       },
       {
             "no": 4,
@@ -1620,8 +1687,8 @@
             "pos": "DF",
             "birth": "1990/08/27",
             "nation": "한국",
-            "s2026": "9 / 0 / 0",
-            "career": "310 / 13 / 5"
+            "s2026": "11 / 0 / 0",
+            "career": "312 / 13 / 5"
       },
       {
             "no": 5,
@@ -1629,8 +1696,8 @@
             "pos": "DF",
             "birth": "1993/09/04",
             "nation": "한국",
-            "s2026": "10 / 1 / 0",
-            "career": "229 / 4 / 4"
+            "s2026": "13 / 1 / 0",
+            "career": "232 / 4 / 4"
       },
       {
             "no": 6,
@@ -1647,8 +1714,8 @@
             "pos": "MF",
             "birth": "1997/09/28",
             "nation": "브라질",
-            "s2026": "11 / 3 / 3",
-            "career": "82 / 20 / 19"
+            "s2026": "13 / 4 / 3",
+            "career": "84 / 21 / 19"
       },
       {
             "no": 8,
@@ -1656,8 +1723,8 @@
             "pos": "MF",
             "birth": "1993/06/01",
             "nation": "한국",
-            "s2026": "10 / 1 / 0",
-            "career": "212 / 15 / 5"
+            "s2026": "13 / 1 / 0",
+            "career": "215 / 15 / 5"
       },
       {
             "no": 9,
@@ -1665,8 +1732,8 @@
             "pos": "FW",
             "birth": "1999/02/16",
             "nation": "브라질",
-            "s2026": "10 / 1 / 2",
-            "career": "10 / 1 / 2"
+            "s2026": "11 / 1 / 2",
+            "career": "11 / 1 / 2"
       },
       {
             "no": 10,
@@ -1683,8 +1750,8 @@
             "pos": "FW",
             "birth": "1999/02/02",
             "nation": "브라질",
-            "s2026": "11 / 3 / 0",
-            "career": "11 / 3 / 0"
+            "s2026": "13 / 5 / 0",
+            "career": "13 / 5 / 0"
       },
       {
             "no": 13,
@@ -1692,8 +1759,8 @@
             "pos": "MF",
             "birth": "1998/02/09",
             "nation": "한국",
-            "s2026": "7 / 0 / 0",
-            "career": "27 / 1 / 0"
+            "s2026": "8 / 0 / 0",
+            "career": "28 / 1 / 0"
       },
       {
             "no": 14,
@@ -1701,8 +1768,8 @@
             "pos": "FW",
             "birth": "2003/05/15",
             "nation": "한국",
-            "s2026": "2 / 0 / 0",
-            "career": "69 / 6 / 1"
+            "s2026": "3 / 0 / 0",
+            "career": "70 / 6 / 1"
       },
       {
             "no": 15,
@@ -1719,8 +1786,8 @@
             "pos": "MF",
             "birth": "2000/09/19",
             "nation": "한국",
-            "s2026": "4 / 0 / 0",
-            "career": "46 / 3 / 0"
+            "s2026": "7 / 0 / 0",
+            "career": "49 / 3 / 0"
       },
       {
             "no": 17,
@@ -1728,8 +1795,8 @@
             "pos": "MF",
             "birth": "1997/01/06",
             "nation": "한국",
-            "s2026": "6 / 0 / 1",
-            "career": "131 / 5 / 6"
+            "s2026": "9 / 0 / 1",
+            "career": "134 / 5 / 6"
       },
       {
             "no": 19,
@@ -1737,8 +1804,8 @@
             "pos": "FW",
             "birth": "1994/11/15",
             "nation": "한국",
-            "s2026": "9 / 2 / 2",
-            "career": "63 / 6 / 4"
+            "s2026": "12 / 2 / 2",
+            "career": "66 / 6 / 4"
       },
       {
             "no": 20,
@@ -1746,8 +1813,8 @@
             "pos": "DF",
             "birth": "2003/07/03",
             "nation": "한국",
-            "s2026": "- / - / -",
-            "career": "23 / 0 / 0"
+            "s2026": "2 / 0 / 0",
+            "career": "25 / 0 / 0"
       },
       {
             "no": 21,
@@ -1755,8 +1822,8 @@
             "pos": "DF",
             "birth": "1992/01/31",
             "nation": "한국",
-            "s2026": "9 / 0 / 0",
-            "career": "121 / 5 / 3"
+            "s2026": "11 / 0 / 0",
+            "career": "123 / 5 / 3"
       },
       {
             "no": 22,
@@ -1764,8 +1831,8 @@
             "pos": "DF",
             "birth": "1992/12/28",
             "nation": "한국",
-            "s2026": "11 / 0 / 0",
-            "career": "309 / 16 / 16"
+            "s2026": "13 / 1 / 0",
+            "career": "311 / 17 / 16"
       },
       {
             "no": 23,
@@ -1773,8 +1840,8 @@
             "pos": "GK",
             "birth": "2001/04/20",
             "nation": "한국",
-            "s2026": "11 / 11 / 2",
-            "career": "58 / 55 / 14"
+            "s2026": "13 / 13 / 2",
+            "career": "60 / 57 / 14"
       },
       {
             "no": 24,
@@ -1809,8 +1876,8 @@
             "pos": "FW",
             "birth": "1999/06/26",
             "nation": "한국",
-            "s2026": "11 / 2 / 0",
-            "career": "170 / 22 / 8"
+            "s2026": "14 / 3 / 0",
+            "career": "173 / 23 / 8"
       },
       {
             "no": 31,
@@ -1818,8 +1885,8 @@
             "pos": "GK",
             "birth": "1989/01/04",
             "nation": "한국",
-            "s2026": "1 / 1 / 0",
-            "career": "209 / 246 / 54"
+            "s2026": "2 / 3 / 0",
+            "career": "210 / 248 / 54"
       },
       {
             "no": 32,
@@ -1827,8 +1894,8 @@
             "pos": "DF",
             "birth": "1992/06/16",
             "nation": "한국",
-            "s2026": "11 / 0 / 0",
-            "career": "277 / 8 / 20"
+            "s2026": "14 / 0 / 0",
+            "career": "280 / 8 / 20"
       },
       {
             "no": 37,
@@ -1863,8 +1930,8 @@
             "pos": "MF",
             "birth": "1999/03/17",
             "nation": "스웨덴",
-            "s2026": "3 / 0 / 0",
-            "career": "3 / 0 / 0"
+            "s2026": "6 / 0 / 1",
+            "career": "6 / 0 / 1"
       },
       {
             "no": 47,
@@ -1885,13 +1952,22 @@
             "career": "48 / 4 / 2"
       },
       {
+            "no": 66,
+            "name": "박종현",
+            "pos": "DF",
+            "birth": "2000/11/24",
+            "nation": "한국",
+            "s2026": "- / - / -",
+            "career": "103 / 0 / 0"
+      },
+      {
             "no": 70,
             "name": "오형준",
             "pos": "FW",
             "birth": "2007/04/17",
             "nation": "한국",
-            "s2026": "- / - / -",
-            "career": "- / - / -"
+            "s2026": "1 / 0 / 0",
+            "career": "1 / 0 / 0"
       },
       {
             "no": 71,
@@ -1899,8 +1975,8 @@
             "pos": "FW",
             "birth": "2004/08/19",
             "nation": "한국",
-            "s2026": "6 / 0 / 0",
-            "career": "65 / 7 / 0"
+            "s2026": "9 / 0 / 1",
+            "career": "68 / 7 / 1"
       },
       {
             "no": 77,
@@ -1921,6 +1997,105 @@
             "career": "308 / 10 / 36"
       }
 ];
+
+
+    const recentNews = [
+      {
+            "id": "youtube-eJOhPSz-l9E",
+            "source": "youtube",
+            "sourceLabel": "YouTube",
+            "title": "⚽The day of Violet",
+            "url": "https://www.youtube.com/watch?v=eJOhPSz-l9E",
+            "publishedAt": "2026-05-28",
+            "category": "sns"
+      },
+      {
+            "id": "youtube-9xI_OpXPi3U",
+            "source": "youtube",
+            "sourceLabel": "YouTube",
+            "title": "⚽Goal of the Month",
+            "url": "https://www.youtube.com/watch?v=9xI_OpXPi3U",
+            "publishedAt": "2026-05-28",
+            "category": "sns"
+      },
+      {
+            "id": "TNotice-721",
+            "source": "official",
+            "sourceLabel": "공지사항",
+            "title": "온라인스토어 오픈 지연에 따른 사과 및 안내",
+            "url": "https://www.fc-anyang.com/news/newsDetail.asp?menu=TNotice&seq=721",
+            "publishedAt": "2026-05-22",
+            "category": "event"
+      },
+      {
+            "id": "youtube-gASFnL7iIN0",
+            "source": "youtube",
+            "sourceLabel": "YouTube",
+            "title": "콧수염이 난 바티를 찾아보세요!🔎",
+            "url": "https://www.youtube.com/watch?v=gASFnL7iIN0",
+            "publishedAt": "2026-05-21",
+            "category": "sns"
+      }
+];
+
+    const communityRumors = [];
+
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+    }
+
+    function renderRecentNews() {
+      const list = document.getElementById('recentNewsList');
+      if (!list) return;
+      if (!recentNews.length) {
+        list.innerHTML = '<div class="empty-state">최근 1주일 공식 소식을 확인 중입니다.</div>';
+        return;
+      }
+      const categoryLabel = { event: '이벤트', player: '선수/영입', sns: '영상', partner: '협약', club: '구단' };
+      list.innerHTML = recentNews.map(item => {
+        const badgeClass = item.category === 'sns' || item.source === 'youtube' ? 'sns' : 'official';
+        const badge = categoryLabel[item.category] || item.sourceLabel || '소식';
+        return `
+          <a class="news-card" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">
+            <div class="news-card-top">
+              <span class="badge ${badgeClass}">${escapeHtml(badge)}</span>
+              <span class="small mono">${escapeHtml(item.publishedAt || '')}</span>
+            </div>
+            <div class="news-title">${escapeHtml(item.title)}</div>
+            <div class="news-meta">${escapeHtml(item.sourceLabel || item.source || '')}</div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    function renderCommunityRumors() {
+      const list = document.getElementById('communityRumorList');
+      if (!list) return;
+      if (!communityRumors.length) {
+        list.innerHTML = '<div class="empty-state">최근 1주일 영입/이적 루머 게시글이 없거나 수집이 제한되었습니다.</div>';
+        return;
+      }
+      list.innerHTML = communityRumors.map(item => {
+        const keywords = (item.keywords || []).slice(0, 4).map(k => `<span class="keyword-chip">${escapeHtml(k)}</span>`).join('');
+        const comments = Number.isFinite(item.commentCount) ? ` · 댓글 ${item.commentCount}` : '';
+        const views = Number.isFinite(item.viewCount) ? ` · 조회 ${item.viewCount}` : '';
+        return `
+          <a class="news-card" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">
+            <div class="news-card-top">
+              <span class="badge rumor">비공식</span>
+              <span class="small mono">${escapeHtml(item.publishedAt || '')}</span>
+            </div>
+            <div class="news-title">${escapeHtml(item.title)}</div>
+            <div class="news-meta">${escapeHtml(item.sourceLabel || item.source || '')}${comments}${views}</div>
+            <div class="keyword-row">${keywords}</div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    renderRecentNews();
+    renderCommunityRumors();
 
     const rankingBody = document.getElementById('rankingBody');
     ranking.forEach(row => {

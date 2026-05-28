@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+import hashlib
+import html as html_lib
 import json
 import re
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from urllib.parse import urljoin
 
 import requests
 
@@ -18,6 +22,16 @@ HTML_PATH = BASE / 'dist' / 'index.html'
 POLICY_RULES_PATH = BASE / 'ticket_policy_rules.json'
 HEADERS = {'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/json; charset=utf-8'}
 TL_TEAM_URL = 'https://www.ticketlink.co.kr/sports/138/86'
+FC_ANYANG_BASE_URL = 'https://www.fc-anyang.com'
+NAVER_BLOG_RSS_URL = 'https://rss.blog.naver.com/fcanyang2013.xml'
+YOUTUBE_RSS_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id=UC9UFdmIfiMBKawVCAbRYy3g'
+DCINSIDE_GALLERY_URL = 'https://gall.dcinside.com/mgallery/board/lists/?id=fcanyang2013'
+FMKOREA_SEARCH_URL = 'https://www.fmkorea.com/search.php?act=IS&is_keyword=FC%EC%95%88%EC%96%91&where=document'
+TRANSFER_RUMOR_KEYWORDS = [
+    '영입', '이적', '임대', '방출', '계약', '재계약', '오피셜', '썰', '루머',
+    '온다', '나간다', '복귀', '콜업', '테스트', '외국인', '등록', '선수단',
+    'FW', 'MF', 'DF', 'GK', '공격수', '미드필더', '수비수', '골키퍼', '용병',
+]
 
 
 def get_json(url, payload=None):
@@ -30,7 +44,289 @@ def get_json(url, payload=None):
 
 
 def strip_tags(s: str) -> str:
-    return re.sub(r'<.*?>', '', s).replace('&nbsp;', ' ').strip()
+    text = re.sub(r'<.*?>', '', s)
+    text = html_lib.unescape(text).replace('\xa0', ' ').replace('&nbsp;', ' ')
+    return re.sub(r'\s+', ' ', text).strip()
+
+
+def normalize_date(value):
+    if not value:
+        return ''
+    value = value.strip()
+    for fmt in ('%Y-%m-%d', '%Y.%m.%d', '%Y-%m-%dT%H:%M:%S%z', '%Y-%m-%dT%H:%M:%S+00:00'):
+        try:
+            return datetime.strptime(value, fmt).strftime('%Y-%m-%d')
+        except Exception:
+            pass
+    m = re.search(r'(20\d{2})[-.](\d{2})[-.](\d{2})', value)
+    if m:
+        return f'{m.group(1)}-{m.group(2)}-{m.group(3)}'
+    return value[:10]
+
+
+def classify_news_title(title):
+    if re.search(r'영입|이적|임대|방출|계약|재계약|복귀|소집|선수|수비수|공격수|미드필더|골키퍼|GK|DF|MF|FW', title, re.I):
+        return 'player'
+    if re.search(r'이벤트|브랜드데이|모집|안내|클래스|행사|오픈|스탬프|팬|참가|데이|플로깅|캠페인|봉사', title):
+        return 'event'
+    if re.search(r'후원|협약|파트너|광고', title):
+        return 'partner'
+    return 'club'
+
+
+def parse_int(value):
+    try:
+        return int(str(value).replace(',', '').strip())
+    except Exception:
+        return None
+
+
+def dedupe_items(items):
+    out = []
+    seen = set()
+    for item in items:
+        key = item.get('url') or f"{item.get('source')}::{item.get('title')}::{item.get('publishedAt')}"
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(item)
+    return out
+
+
+def within_days(item, days=7, now=None):
+    published = item.get('publishedAt')
+    if not published:
+        return True
+    now = now or datetime.now(timezone(timedelta(hours=9)))
+    try:
+        dt = datetime.strptime(published[:10], '%Y-%m-%d').replace(tzinfo=now.tzinfo)
+    except Exception:
+        return True
+    return dt.date() >= (now - timedelta(days=days)).date()
+
+
+def parse_fc_anyang_board_items(page_html, menu, source_label):
+    items = []
+    for row_html in re.findall(r'(<tr[^>]*>.*?</tr>)', page_html, flags=re.S | re.I):
+        if '202' not in row_html:
+            continue
+        date_m = re.search(r'(20\d{2}[-.]\d{2}[-.]\d{2})', row_html)
+        if not date_m:
+            continue
+        seq_m = re.search(r'(?:seq=|goDetail\(|newsDetail\.asp\?menu=[^&]+&seq=)(\d+)', row_html)
+        if not seq_m:
+            continue
+        seq = seq_m.group(1)
+        link_texts = re.findall(r'<a[^>]*>(.*?)</a>', row_html, flags=re.S | re.I)
+        title = ''
+        for link_text in link_texts:
+            candidate = strip_tags(link_text)
+            if candidate and not candidate.isdigit():
+                title = candidate
+                break
+        if not title:
+            cells = [strip_tags(c) for c in re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', row_html, flags=re.S | re.I)]
+            title = next((c for c in cells if c and not c.isdigit() and not re.match(r'20\d{2}[-.]\d{2}[-.]\d{2}', c) and not re.match(r'^[\d,]+$', c)), '')
+        if not title:
+            continue
+        items.append({
+            'id': f'{menu}-{seq}',
+            'source': 'official',
+            'sourceLabel': source_label,
+            'title': title,
+            'url': f'{FC_ANYANG_BASE_URL}/news/newsDetail.asp?menu={menu}&seq={seq}',
+            'publishedAt': normalize_date(date_m.group(1)),
+            'category': classify_news_title(title),
+        })
+    return items
+
+
+def parse_naver_blog_rss_items(xml_text):
+    items = []
+    try:
+        root = ET.fromstring(xml_text)
+    except Exception:
+        return items
+    channel = root.find('channel')
+    if channel is None:
+        return items
+    for item in channel.findall('item'):
+        title = item.findtext('title') or ''
+        link = item.findtext('link') or ''
+        pub_date = item.findtext('pubDate') or ''
+        published = ''
+        try:
+            from email.utils import parsedate_to_datetime
+            published = parsedate_to_datetime(pub_date).astimezone(timezone(timedelta(hours=9))).strftime('%Y-%m-%d')
+        except Exception:
+            published = normalize_date(pub_date)
+        title = strip_tags(title)
+        if not title:
+            continue
+        items.append({
+            'id': f"naver-{hashlib.sha1((link or title).encode('utf-8')).hexdigest()[:12]}",
+            'source': 'naver_blog',
+            'sourceLabel': '네이버 블로그',
+            'title': title,
+            'url': link,
+            'publishedAt': published,
+            'category': classify_news_title(title),
+        })
+    return items
+
+
+def parse_youtube_feed_items(xml_text):
+    items = []
+    try:
+        root = ET.fromstring(xml_text)
+    except Exception:
+        return items
+    ns = {'atom': 'http://www.w3.org/2005/Atom', 'yt': 'http://www.youtube.com/xml/schemas/2015'}
+    for entry in root.findall('atom:entry', ns):
+        video_id = entry.findtext('yt:videoId', default='', namespaces=ns)
+        title = entry.findtext('atom:title', default='', namespaces=ns).strip()
+        published = normalize_date(entry.findtext('atom:published', default='', namespaces=ns))
+        if not video_id or not title:
+            continue
+        items.append({
+            'id': f'youtube-{video_id}',
+            'source': 'youtube',
+            'sourceLabel': 'YouTube',
+            'title': title,
+            'url': f'https://www.youtube.com/watch?v={video_id}',
+            'publishedAt': published,
+            'category': 'sns',
+        })
+    return items
+
+
+def parse_dcinside_rumor_items(page_html, now_year=None):
+    now_year = now_year or datetime.now(timezone(timedelta(hours=9))).year
+    items = []
+    for row in re.findall(r'<tr[^>]+ub-content[^>]*>(.*?)</tr>', page_html, flags=re.S | re.I):
+        no_m = re.search(r'data-no="(\d+)"', row) or re.search(r'<td[^>]+gall_num[^>]*>\s*(\d+)', row, flags=re.S | re.I)
+        link_m = re.search(r'<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', row, flags=re.S | re.I)
+        if not no_m or not link_m:
+            continue
+        title = strip_tags(link_m.group(2))
+        keywords = [kw for kw in TRANSFER_RUMOR_KEYWORDS if kw.lower() in title.lower()]
+        if not keywords:
+            continue
+        date_title_m = re.search(r'class="gall_date"[^>]*title="([^"]+)"', row, flags=re.S | re.I)
+        if date_title_m:
+            published = normalize_date(date_title_m.group(1))
+        else:
+            date_text_m = re.search(r'class="gall_date"[^>]*>(.*?)</td>', row, flags=re.S | re.I)
+            date_text = strip_tags(date_text_m.group(1)) if date_text_m else ''
+            if re.match(r'\d{2}\.\d{2}', date_text):
+                published = f'{now_year}-{date_text[:2]}-{date_text[3:5]}'
+            else:
+                published = normalize_date(date_text)
+        reply_m = re.search(r'class="reply_num"[^>]*>\s*\[(\d+)\]', row, flags=re.S | re.I)
+        cells = [strip_tags(c) for c in re.findall(r'<td[^>]*>(.*?)</td>', row, flags=re.S | re.I)]
+        view_count = parse_int(cells[-2]) if len(cells) >= 2 else None
+        recommend_count = parse_int(cells[-1]) if len(cells) >= 1 else None
+        url = urljoin('https://gall.dcinside.com', html_lib.unescape(link_m.group(1)))
+        items.append({
+            'id': f'dcinside-{no_m.group(1)}',
+            'source': 'dcinside',
+            'sourceLabel': '디시인사이드',
+            'title': title,
+            'url': url,
+            'publishedAt': published,
+            'keywords': keywords,
+            'commentCount': int(reply_m.group(1)) if reply_m else 0,
+            'viewCount': view_count,
+            'recommendCount': recommend_count,
+            'confidence': 'low',
+            'status': 'unverified',
+        })
+    return items
+
+
+def parse_fmkorea_rumor_items(page_html):
+    items = []
+    seen = set()
+    for href, raw_title in re.findall(r'<a[^>]+href="([^"]*(?:document_srl=\d+|/\d{6,})[^"]*)"[^>]*>(.*?)</a>', page_html, flags=re.S | re.I):
+        title = strip_tags(raw_title)
+        if not title or 'FC안양' not in title and '안양' not in title:
+            continue
+        keywords = [kw for kw in TRANSFER_RUMOR_KEYWORDS if kw.lower() in title.lower()]
+        if not keywords:
+            continue
+        url = urljoin('https://www.fmkorea.com', html_lib.unescape(href))
+        if url in seen:
+            continue
+        seen.add(url)
+        doc_m = re.search(r'(?:document_srl=|/)(\d{6,})', url)
+        items.append({
+            'id': f"fmkorea-{doc_m.group(1) if doc_m else hashlib.sha1(url.encode('utf-8')).hexdigest()[:10]}",
+            'source': 'fmkorea',
+            'sourceLabel': '에펨코리아',
+            'title': title,
+            'url': url,
+            'publishedAt': '',
+            'keywords': keywords,
+            'commentCount': None,
+            'viewCount': None,
+            'recommendCount': None,
+            'confidence': 'low',
+            'status': 'unverified',
+        })
+    return items
+
+
+def fetch_text(url, headers=None):
+    r = requests.get(url, headers=headers or {'User-Agent': 'Mozilla/5.0'}, timeout=30)
+    r.raise_for_status()
+    if r.encoding is None or r.encoding.lower() in ('iso-8859-1', 'latin-1'):
+        r.encoding = r.apparent_encoding or 'utf-8'
+    return r.text
+
+
+def fetch_recent_news(days=7):
+    items = []
+    sources = [
+        (f'{FC_ANYANG_BASE_URL}/news/news.asp?menu=TNews', 'TNews', '구단소식'),
+        (f'{FC_ANYANG_BASE_URL}/news/news.asp?menu=TNotice', 'TNotice', '공지사항'),
+    ]
+    for url, menu, label in sources:
+        try:
+            items.extend(parse_fc_anyang_board_items(fetch_text(url), menu, label))
+        except Exception as e:
+            print(f'[news] FC안양 {label} 수집 오류: {e}')
+    try:
+        items.extend(parse_naver_blog_rss_items(fetch_text(NAVER_BLOG_RSS_URL)))
+    except Exception as e:
+        print(f'[news] 네이버 블로그 RSS 수집 오류: {e}')
+    try:
+        items.extend(parse_youtube_feed_items(fetch_text(YOUTUBE_RSS_URL)))
+    except Exception as e:
+        print(f'[news] YouTube RSS 수집 오류: {e}')
+    items = [item for item in dedupe_items(items) if within_days(item, days=days)]
+    items.sort(key=lambda x: (x.get('publishedAt') or '', x.get('source') or ''), reverse=True)
+    return items[:12]
+
+
+def fetch_community_rumors(days=7):
+    items = []
+    headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://gall.dcinside.com/'}
+    urls = [DCINSIDE_GALLERY_URL]
+    for keyword in TRANSFER_RUMOR_KEYWORDS[:12]:
+        urls.append(f'{DCINSIDE_GALLERY_URL}&s_type=search_subject_memo&s_keyword={keyword}')
+    for url in urls:
+        try:
+            items.extend(parse_dcinside_rumor_items(fetch_text(url, headers=headers)))
+        except Exception as e:
+            print(f'[rumor] 디시인사이드 수집 오류: {e}')
+    try:
+        fmkorea_headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.fmkorea.com/'}
+        items.extend(parse_fmkorea_rumor_items(fetch_text(FMKOREA_SEARCH_URL, headers=fmkorea_headers)))
+    except Exception as e:
+        print(f'[rumor] 에펨코리아 수집 오류: {e}')
+    items = [item for item in dedupe_items(items) if within_days(item, days=days)]
+    items.sort(key=lambda x: (x.get('publishedAt') or '', x.get('commentCount') or 0, x.get('viewCount') or 0), reverse=True)
+    return items[:10]
 
 
 def extract(text: str, a: str, b: str) -> str:
@@ -519,12 +815,16 @@ def main():
         '2026': fetch_round_progress(2026),
     }
     players = fetch_players()
+    recent_news = fetch_recent_news(days=7)
+    community_rumors = fetch_community_rumors(days=7)
 
     text = HTML_PATH.read_text(encoding='utf-8')
     text = replace_const_array(text, 'ranking', ranking)
     text = replace_const_array(text, 'schedule', schedule)
     text = replace_const_json(text, 'roundProgress', round_progress)
     text = replace_const_array(text, 'players', players)
+    text = replace_const_array(text, 'recentNews', recent_news)
+    text = replace_const_array(text, 'communityRumors', community_rumors)
     kst = timezone(timedelta(hours=9))
     today = datetime.now(kst).strftime('%Y-%m-%d %H:%M KST')
     text = re.sub(r'(<span id="updateDateText">)(.*?)(</span>)', lambda m: f'{m.group(1)}{today}{m.group(3)}', text)
@@ -538,6 +838,8 @@ def main():
         'ranking_rows': len(ranking),
         'schedule_rows': len(schedule),
         'player_rows': len(players),
+        'recent_news_rows': len(recent_news),
+        'community_rumor_rows': len(community_rumors),
         'round_progress_years': {year: len(rows) for year, rows in round_progress.items()},
         'ticket_on_sale': ticket_on_sale,
         'ticket_open_date_known': ticket_open,
