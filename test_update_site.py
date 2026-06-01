@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime, timedelta, timezone
 
 import update_site
 
@@ -78,6 +79,30 @@ class NewsParsingTests(unittest.TestCase):
         self.assertEqual(items[0]['source'], 'fmkorea')
         self.assertEqual(items[0]['sourceLabel'], '에펨코리아')
         self.assertIn('영입', items[0]['keywords'])
+        self.assertEqual(items[0]['status'], 'unverified')
+
+    def test_parse_redflame_rumor_items_filters_keywords_and_dates(self):
+        html = r'''
+        \"href\":\"/post/4675?\" blah
+        dangerouslySetInnerHTML\":{\"__html\":\"오늘 ㅆㅎㅈ에서 나온 루머\"}
+        \"children\":37 \"children\":\"4일전\" \"children\":4 \"children\":4 \"children\":694
+        \"href\":\"/post/4677?\" blah
+        dangerouslySetInnerHTML\":{\"__html\":\"이번에 나온 카드케이스\"}
+        \"children\":17 \"children\":\"1일전\" \"children\":0 \"children\":5 \"children\":220
+        '''
+        now = datetime(2026, 6, 1, tzinfo=timezone(timedelta(hours=9)))
+
+        items = update_site.parse_redflame_rumor_items(html, now=now)
+
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]['source'], 'redflame')
+        self.assertEqual(items[0]['sourceLabel'], 'REDFLAME')
+        self.assertEqual(items[0]['title'], '오늘 ㅆㅎㅈ에서 나온 루머')
+        self.assertEqual(items[0]['publishedAt'], '2026-05-28')
+        self.assertEqual(items[0]['commentCount'], 4)
+        self.assertEqual(items[0]['recommendCount'], 4)
+        self.assertEqual(items[0]['viewCount'], 694)
+        self.assertIn('ㅆㅎㅈ', items[0]['keywords'])
         self.assertEqual(items[0]['status'], 'unverified')
 
     def test_dedupe_items_prefers_first_seen_url(self):

@@ -7,7 +7,7 @@ import subprocess
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import quote, urljoin
 
 import requests
 
@@ -28,10 +28,12 @@ NAVER_BLOG_RSS_URL = 'https://rss.blog.naver.com/fcanyang2013.xml'
 YOUTUBE_RSS_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id=UC9UFdmIfiMBKawVCAbRYy3g'
 DCINSIDE_GALLERY_URL = 'https://gall.dcinside.com/mgallery/board/lists/?id=fcanyang2013'
 FMKOREA_SEARCH_URL = 'https://www.fmkorea.com/search.php?act=IS&is_keyword=FC%EC%95%88%EC%96%91&where=document'
+REDFLAME_BOARD_URL = 'https://www.redflame.co.kr/post'
 TRANSFER_RUMOR_KEYWORDS = [
     '영입', '이적', '임대', '방출', '계약', '재계약', '오피셜', '썰', '루머',
     '온다', '나간다', '복귀', '콜업', '테스트', '외국인', '등록', '선수단',
     'FW', 'MF', 'DF', 'GK', '공격수', '미드필더', '수비수', '골키퍼', '용병',
+    '토마스', '마테우스', '아일톤', '원두재', 'ㅆㅎㅈ', '썰호정',
 ]
 
 
@@ -86,7 +88,7 @@ def dedupe_items(items):
     out = []
     seen = set()
     for item in items:
-        key = item.get('url') or f"{item.get('source')}::{item.get('title')}::{item.get('publishedAt')}"
+        key = item.get('id') or item.get('url') or f"{item.get('source')}::{item.get('title')}::{item.get('publishedAt')}"
         if key in seen:
             continue
         seen.add(key)
@@ -277,6 +279,53 @@ def parse_fmkorea_rumor_items(page_html):
     return items
 
 
+def parse_redflame_date(date_text, now=None):
+    now = now or datetime.now(timezone(timedelta(hours=9)))
+    date_text = (date_text or '').strip()
+    rel_m = re.match(r'(\d+)일전', date_text)
+    if rel_m:
+        return (now - timedelta(days=int(rel_m.group(1)))).strftime('%Y-%m-%d')
+    m = re.match(r'(\d{2})\.(\d{2})\.(\d{2})', date_text)
+    if m:
+        return f'20{m.group(1)}-{m.group(2)}-{m.group(3)}'
+    return normalize_date(date_text)
+
+
+def parse_redflame_rumor_items(page_html, now=None):
+    """Parse FC Anyang fan-site REDFLAME board cards from Next.js/RSC HTML."""
+    normalized = page_html.replace('\\"', '"').replace('\\u0026', '&')
+    starts = list(re.finditer(r'"href":"/post/(\d+)\?"', normalized))
+    items = []
+    for idx, match in enumerate(starts):
+        post_id = match.group(1)
+        end = starts[idx + 1].start() if idx + 1 < len(starts) else match.start() + 6000
+        segment = normalized[match.start():end]
+        title_m = re.search(r'dangerouslySetInnerHTML":\{"__html":"([^"]*)"', segment)
+        if not title_m:
+            continue
+        title = strip_tags(title_m.group(1))
+        keywords = [kw for kw in TRANSFER_RUMOR_KEYWORDS if kw.lower() in title.lower()]
+        if not keywords:
+            continue
+        date_m = re.search(r'"children":"(\d+일전|\d{2}\.\d{2}\.\d{2})"', segment)
+        numbers = [int(n) for n in re.findall(r'"children":(\d+)', segment)]
+        items.append({
+            'id': f'redflame-{post_id}',
+            'source': 'redflame',
+            'sourceLabel': 'REDFLAME',
+            'title': title,
+            'url': f'https://www.redflame.co.kr/post/{post_id}',
+            'publishedAt': parse_redflame_date(date_m.group(1), now=now) if date_m else '',
+            'keywords': keywords,
+            'commentCount': numbers[-3] if len(numbers) >= 3 else None,
+            'recommendCount': numbers[-2] if len(numbers) >= 2 else None,
+            'viewCount': numbers[-1] if numbers else None,
+            'confidence': 'low',
+            'status': 'unverified',
+        })
+    return items
+
+
 def fetch_text_with_curl(url, headers=None):
     cmd = [
         'curl', '-fsSL', '--http1.1', '--tlsv1.2', '--ciphers', 'DEFAULT@SECLEVEL=1',
@@ -335,7 +384,7 @@ def fetch_community_rumors(days=7):
     headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://gall.dcinside.com/'}
     urls = [DCINSIDE_GALLERY_URL]
     for keyword in TRANSFER_RUMOR_KEYWORDS[:12]:
-        urls.append(f'{DCINSIDE_GALLERY_URL}&s_type=search_subject_memo&s_keyword={keyword}')
+        urls.append(f'{DCINSIDE_GALLERY_URL}&s_type=search_subject_memo&s_keyword={quote(keyword)}')
     for url in urls:
         try:
             items.extend(parse_dcinside_rumor_items(fetch_text(url, headers=headers)))
@@ -346,6 +395,11 @@ def fetch_community_rumors(days=7):
         items.extend(parse_fmkorea_rumor_items(fetch_text(FMKOREA_SEARCH_URL, headers=fmkorea_headers)))
     except Exception as e:
         print(f'[rumor] 에펨코리아 수집 오류: {e}')
+    try:
+        redflame_headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.redflame.co.kr/'}
+        items.extend(parse_redflame_rumor_items(fetch_text(REDFLAME_BOARD_URL, headers=redflame_headers)))
+    except Exception as e:
+        print(f'[rumor] REDFLAME 수집 오류: {e}')
     items = [item for item in dedupe_items(items) if within_days(item, days=days)]
     items.sort(key=lambda x: (x.get('publishedAt') or '', x.get('commentCount') or 0, x.get('viewCount') or 0), reverse=True)
     return items[:10]
