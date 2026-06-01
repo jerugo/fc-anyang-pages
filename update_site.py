@@ -31,10 +31,11 @@ FMKOREA_SEARCH_QUERIES = [
     '안양 영입', '안양 이적', '안양 임대', '안양 외국인', '안양 토마스',
     'FC안양 영입', 'FC안양 이적', 'FC안양 루머', 'FC안양 썰',
 ]
+REDFLAME_BOARD_URL = 'https://www.redflame.co.kr/post'
 TRANSFER_RUMOR_KEYWORDS = [
     '영입', '이적', '임대', '방출', '계약', '재계약', '오피셜', '썰', '루머',
     '온다', '나간다', '복귀', '콜업', '테스트', '외국인', '등록', '선수단',
-    '토마스', '원두재', '마테우스', '유키치', '엘쿠라노',
+    '토마스', '원두재', '마테우스', '유키치', '엘쿠라노', '아일톤', 'ㅆㅎㅈ', '썰호정',
     'FW', 'MF', 'DF', 'GK', '공격수', '미드필더', '수비수', '골키퍼', '용병',
 ]
 MANUAL_COMMUNITY_RUMORS = [
@@ -429,6 +430,53 @@ def parse_fmkorea_rumor_items(page_html, now=None):
     return items
 
 
+def parse_redflame_date(date_text, now=None):
+    now = now or datetime.now(timezone(timedelta(hours=9)))
+    date_text = (date_text or '').strip()
+    rel_m = re.match(r'(\d+)일전', date_text)
+    if rel_m:
+        return (now - timedelta(days=int(rel_m.group(1)))).strftime('%Y-%m-%d')
+    m = re.match(r'(\d{2})\.(\d{2})\.(\d{2})', date_text)
+    if m:
+        return f'20{m.group(1)}-{m.group(2)}-{m.group(3)}'
+    return normalize_date(date_text)
+
+
+def parse_redflame_rumor_items(page_html, now=None):
+    """Parse FC Anyang fan-site REDFLAME board cards from Next.js/RSC HTML."""
+    normalized = page_html.replace('\\"', '"').replace('\\u0026', '&')
+    starts = list(re.finditer(r'"href":"/post/(\d+)\?"', normalized))
+    items = []
+    for idx, match in enumerate(starts):
+        post_id = match.group(1)
+        end = starts[idx + 1].start() if idx + 1 < len(starts) else match.start() + 6000
+        segment = normalized[match.start():end]
+        title_m = re.search(r'dangerouslySetInnerHTML":\{"__html":"([^"]*)"', segment)
+        if not title_m:
+            continue
+        title = strip_tags(title_m.group(1))
+        keywords = [kw for kw in TRANSFER_RUMOR_KEYWORDS if kw.lower() in title.lower()]
+        if not keywords:
+            continue
+        date_m = re.search(r'"children":"(\d+일전|\d{2}\.\d{2}\.\d{2})"', segment)
+        numbers = [int(n) for n in re.findall(r'"children":(\d+)', segment)]
+        items.append({
+            'id': f'redflame-{post_id}',
+            'source': 'redflame',
+            'sourceLabel': 'REDFLAME',
+            'title': title,
+            'url': f'https://www.redflame.co.kr/post/{post_id}',
+            'publishedAt': parse_redflame_date(date_m.group(1), now=now) if date_m else '',
+            'keywords': keywords,
+            'commentCount': numbers[-3] if len(numbers) >= 3 else None,
+            'recommendCount': numbers[-2] if len(numbers) >= 2 else None,
+            'viewCount': numbers[-1] if numbers else None,
+            'confidence': 'low',
+            'status': 'unverified',
+        })
+    return items
+
+
 def fetch_text_with_curl(url, headers=None):
     cmd = [
         'curl', '-fsSL', '--http1.1', '--tlsv1.2', '--ciphers', 'DEFAULT@SECLEVEL=1',
@@ -504,6 +552,11 @@ def fetch_community_rumors(days=7):
             items.extend(parse_fmkorea_rumor_items(fetch_text(url, headers=fmkorea_headers)))
         except Exception as e:
             print(f'[rumor] 에펨코리아 수집 오류({query}): {e}')
+    try:
+        redflame_headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.redflame.co.kr/'}
+        items.extend(parse_redflame_rumor_items(fetch_text(REDFLAME_BOARD_URL, headers=redflame_headers)))
+    except Exception as e:
+        print(f'[rumor] REDFLAME 수집 오류: {e}')
     items = [item for item in dedupe_items(items) if within_days(item, days=days)]
     items.sort(key=lambda x: (x.get('publishedAt') or '', x.get('recommendCount') or 0, x.get('commentCount') or 0, x.get('viewCount') or 0), reverse=True)
     return items[:10]
