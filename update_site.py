@@ -27,13 +27,108 @@ FC_ANYANG_BASE_URL = 'https://www.fc-anyang.com'
 NAVER_BLOG_RSS_URL = 'https://rss.blog.naver.com/fcanyang2013.xml'
 YOUTUBE_RSS_URL = 'https://www.youtube.com/feeds/videos.xml?channel_id=UC9UFdmIfiMBKawVCAbRYy3g'
 DCINSIDE_GALLERY_URL = 'https://gall.dcinside.com/mgallery/board/lists/?id=fcanyang2013'
-FMKOREA_SEARCH_URL = 'https://www.fmkorea.com/search.php?act=IS&is_keyword=FC%EC%95%88%EC%96%91&where=document'
+FMKOREA_SEARCH_QUERIES = [
+    '안양 영입', '안양 이적', '안양 임대', '안양 외국인', '안양 토마스',
+    'FC안양 영입', 'FC안양 이적', 'FC안양 루머', 'FC안양 썰',
+]
 REDFLAME_BOARD_URL = 'https://www.redflame.co.kr/post'
 TRANSFER_RUMOR_KEYWORDS = [
     '영입', '이적', '임대', '방출', '계약', '재계약', '오피셜', '썰', '루머',
     '온다', '나간다', '복귀', '콜업', '테스트', '외국인', '등록', '선수단',
+    '토마스', '원두재', '마테우스', '유키치', '엘쿠라노', '아일톤', 'ㅆㅎㅈ', '썰호정',
     'FW', 'MF', 'DF', 'GK', '공격수', '미드필더', '수비수', '골키퍼', '용병',
-    '토마스', '마테우스', '아일톤', '원두재', 'ㅆㅎㅈ', '썰호정',
+]
+MANUAL_COMMUNITY_RUMORS = [
+    {
+        'id': 'fmkorea-9881766039',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '안양/인천/광주',
+        'summary': '주축 외국인 선수 2명은 6월 1주차 이후 윤곽 가능성. 국내 2팀/해외 1팀 관심, 영입은 당장 단계는 아니라는 루머.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9881766039',
+        'publishedAt': '2026-05-28',
+        'keywords': ['외국인', '이적', '영입', '루머'],
+        'commentCount': 45,
+        'viewCount': 20000,
+        'recommendCount': 39,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
+    {
+        'id': 'fmkorea-9880392934',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '썰호정 단독| 울산은 토마스, 안양은 원두재 영입 추진중',
+        'summary': '토마스 울산행 가능성과 안양의 원두재 영입 추진을 묶어 언급한 팬 커뮤니티 루머.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9880392934',
+        'publishedAt': '2026-05-28',
+        'keywords': ['토마스', '원두재', '영입', '이적'],
+        'commentCount': 29,
+        'viewCount': 30000,
+        'recommendCount': 41,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
+    {
+        'id': 'fmkorea-9880457237',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '여러가지 루머',
+        'summary': '울산이 토마스를 노리고, 안양의 원두재 건은 반반이라는 취지의 루머 정리글.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9880457237',
+        'publishedAt': '2026-05-28',
+        'keywords': ['토마스', '원두재', '루머'],
+        'commentCount': 60,
+        'viewCount': 30000,
+        'recommendCount': 65,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
+    {
+        'id': 'fmkorea-9879336476',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '안양 빅네임',
+        'summary': '원두재 영입 진행 중이고 분위기가 긍정적이라는 루머. 권경원 어필 언급.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9879336476',
+        'publishedAt': '2026-05-27',
+        'keywords': ['원두재', '영입', '루머'],
+        'commentCount': 23,
+        'viewCount': 20000,
+        'recommendCount': 59,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
+    {
+        'id': 'fmkorea-9879391004',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '안양 울산 루머 정리해보면 (상상회로)',
+        'summary': '토마스 매각 자금으로 원두재/재계약/보강을 상상해 본 팬 해석 글.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9879391004',
+        'publishedAt': '2026-05-27',
+        'keywords': ['토마스', '원두재', '이적', '재계약'],
+        'commentCount': 13,
+        'viewCount': 1113,
+        'recommendCount': 5,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
+    {
+        'id': 'fmkorea-9857762996',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '안양 외국인',
+        'summary': '마테우스는 국내/해외 관심, 구단은 최우선 재계약 대상. 토마스는 해외 1팀 사전 문의와 국내 문의 정도라는 루머.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9857762996',
+        'publishedAt': '2026-05-22',
+        'keywords': ['마테우스', '토마스', '외국인', '재계약', '이적'],
+        'commentCount': 36,
+        'viewCount': 30000,
+        'recommendCount': 71,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
 ]
 
 
@@ -78,10 +173,26 @@ def classify_news_title(title):
 
 
 def parse_int(value):
+    text = str(value).replace(',', '').strip()
+    if not text:
+        return None
+    m = re.match(r'([\d.]+)\s*만', text)
+    if m:
+        return int(float(m.group(1)) * 10000)
     try:
-        return int(str(value).replace(',', '').strip())
+        return int(text)
     except Exception:
         return None
+
+
+def normalize_short_date(value, now=None):
+    now = now or datetime.now(timezone(timedelta(hours=9)))
+    value = (value or '').strip()
+    if re.match(r'\d{2}:\d{2}$', value):
+        return now.strftime('%Y-%m-%d')
+    if re.match(r'\d{2}\.\d{2}$', value):
+        return f'{now.year}-{value[:2]}-{value[3:5]}'
+    return normalize_date(value)
 
 
 def dedupe_items(items):
@@ -247,12 +358,52 @@ def parse_dcinside_rumor_items(page_html, now_year=None):
     return items
 
 
-def parse_fmkorea_rumor_items(page_html):
+def parse_fmkorea_rumor_items(page_html, now=None):
+    now = now or datetime.now(timezone(timedelta(hours=9)))
     items = []
     seen = set()
+
+    row_pattern = r'<tr[^>]*>\s*<td[^>]*>.*?</tr>'
+    for row in re.findall(row_pattern, page_html, flags=re.S | re.I):
+        href_m = re.search(r'<a[^>]+href="([^"]*(?:document_srl=\d+|/\d{6,})[^"]*)"[^>]*>(.*?)</a>', row, flags=re.S | re.I)
+        if not href_m:
+            continue
+        cells = [strip_tags(c) for c in re.findall(r'<td[^>]*>(.*?)</td>', row, flags=re.S | re.I)]
+        if len(cells) < 5:
+            continue
+        title = strip_tags(href_m.group(2))
+        if not title or ('FC안양' not in title and 'fc안양' not in title.lower() and '안양' not in title):
+            continue
+        keywords = [kw for kw in TRANSFER_RUMOR_KEYWORDS if kw.lower() in title.lower()]
+        if not keywords:
+            continue
+        url = urljoin('https://www.fmkorea.com', html_lib.unescape(href_m.group(1)))
+        if url in seen:
+            continue
+        seen.add(url)
+        doc_m = re.search(r'(?:document_srl=|/)(\d{6,})', url)
+        items.append({
+            'id': f"fmkorea-{doc_m.group(1) if doc_m else hashlib.sha1(url.encode('utf-8')).hexdigest()[:10]}",
+            'source': 'fmkorea',
+            'sourceLabel': '에펨코리아',
+            'title': title,
+            'url': url,
+            'publishedAt': normalize_short_date(cells[-3] if len(cells) >= 3 else '', now=now),
+            'keywords': keywords,
+            'commentCount': parse_int(comment_m.group(1)) if (comment_m := re.search(r'\b(\d+)\s*$', title)) else None,
+            'viewCount': parse_int(cells[-2]) if len(cells) >= 2 else None,
+            'recommendCount': parse_int(cells[-1]) if len(cells) >= 1 else None,
+            'confidence': 'low',
+            'status': 'unverified',
+        })
+
+    if items:
+        return items
+
+    # Fallback for alternate/listless markup: keep URL/title even when date columns are unavailable.
     for href, raw_title in re.findall(r'<a[^>]+href="([^"]*(?:document_srl=\d+|/\d{6,})[^"]*)"[^>]*>(.*?)</a>', page_html, flags=re.S | re.I):
         title = strip_tags(raw_title)
-        if not title or 'FC안양' not in title and '안양' not in title:
+        if not title or ('FC안양' not in title and 'fc안양' not in title.lower() and '안양' not in title):
             continue
         keywords = [kw for kw in TRANSFER_RUMOR_KEYWORDS if kw.lower() in title.lower()]
         if not keywords:
@@ -380,28 +531,34 @@ def fetch_recent_news(days=7):
 
 
 def fetch_community_rumors(days=7):
-    items = []
+    items = list(MANUAL_COMMUNITY_RUMORS)
     headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://gall.dcinside.com/'}
     urls = [DCINSIDE_GALLERY_URL]
-    for keyword in TRANSFER_RUMOR_KEYWORDS[:12]:
+    for keyword in TRANSFER_RUMOR_KEYWORDS[:15]:
         urls.append(f'{DCINSIDE_GALLERY_URL}&s_type=search_subject_memo&s_keyword={quote(keyword)}')
     for url in urls:
         try:
             items.extend(parse_dcinside_rumor_items(fetch_text(url, headers=headers)))
         except Exception as e:
             print(f'[rumor] 디시인사이드 수집 오류: {e}')
-    try:
-        fmkorea_headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.fmkorea.com/'}
-        items.extend(parse_fmkorea_rumor_items(fetch_text(FMKOREA_SEARCH_URL, headers=fmkorea_headers)))
-    except Exception as e:
-        print(f'[rumor] 에펨코리아 수집 오류: {e}')
+    fmkorea_headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36',
+        'Referer': 'https://www.fmkorea.com/',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
+    }
+    for query in FMKOREA_SEARCH_QUERIES:
+        url = f'https://www.fmkorea.com/search.php?mid=football_korean&search_target=title_content&search_keyword={quote(query)}'
+        try:
+            items.extend(parse_fmkorea_rumor_items(fetch_text(url, headers=fmkorea_headers)))
+        except Exception as e:
+            print(f'[rumor] 에펨코리아 수집 오류({query}): {e}')
     try:
         redflame_headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.redflame.co.kr/'}
         items.extend(parse_redflame_rumor_items(fetch_text(REDFLAME_BOARD_URL, headers=redflame_headers)))
     except Exception as e:
         print(f'[rumor] REDFLAME 수집 오류: {e}')
     items = [item for item in dedupe_items(items) if within_days(item, days=days)]
-    items.sort(key=lambda x: (x.get('publishedAt') or '', x.get('commentCount') or 0, x.get('viewCount') or 0), reverse=True)
+    items.sort(key=lambda x: (x.get('publishedAt') or '', x.get('recommendCount') or 0, x.get('commentCount') or 0, x.get('viewCount') or 0), reverse=True)
     return items[:10]
 
 
