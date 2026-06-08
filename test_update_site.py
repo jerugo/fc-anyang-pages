@@ -114,6 +114,41 @@ class NewsParsingTests(unittest.TestCase):
 
         self.assertEqual(update_site.dedupe_items(items), [items[0], items[2]])
 
+    def test_fetch_community_rumors_falls_back_when_fresh_scrape_is_empty(self):
+        now = datetime(2026, 6, 8, tzinfo=timezone(timedelta(hours=9)))
+        old_datetime = update_site.datetime
+        old_manual = update_site.MANUAL_COMMUNITY_RUMORS
+        old_fetch_text = update_site.fetch_text
+
+        class FixedDateTime(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return now if tz else now.replace(tzinfo=None)
+
+        try:
+            update_site.datetime = FixedDateTime
+            item = {
+                'id': 'manual-old-but-useful',
+                'source': 'fmkorea',
+                'sourceLabel': '에펨코리아',
+                'title': '안양 외국인 영입 루머',
+                'url': 'https://example.com/rumor',
+                'publishedAt': '2026-05-28',
+                'keywords': ['영입', '루머'],
+                'confidence': 'low',
+                'status': 'unverified',
+            }
+            update_site.MANUAL_COMMUNITY_RUMORS = [item]
+            update_site.fetch_text = lambda *args, **kwargs: ''
+
+            items = update_site.fetch_community_rumors(days=7, fallback_days=30)
+        finally:
+            update_site.datetime = old_datetime
+            update_site.MANUAL_COMMUNITY_RUMORS = old_manual
+            update_site.fetch_text = old_fetch_text
+
+        self.assertEqual(items, [item])
+
 
 if __name__ == '__main__':
     unittest.main()
