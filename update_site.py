@@ -530,7 +530,7 @@ def fetch_recent_news(days=7):
     return items[:12]
 
 
-def fetch_community_rumors(days=7):
+def fetch_community_rumors(days=7, fallback_days=30):
     items = list(MANUAL_COMMUNITY_RUMORS)
     headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://gall.dcinside.com/'}
     urls = [DCINSIDE_GALLERY_URL]
@@ -557,7 +557,18 @@ def fetch_community_rumors(days=7):
         items.extend(parse_redflame_rumor_items(fetch_text(REDFLAME_BOARD_URL, headers=redflame_headers)))
     except Exception as e:
         print(f'[rumor] REDFLAME 수집 오류: {e}')
-    items = [item for item in dedupe_items(items) if within_days(item, days=days)]
+    deduped = dedupe_items(items)
+    recent_items = [item for item in deduped if within_days(item, days=days)]
+    if recent_items:
+        items = recent_items
+    else:
+        # Some community sites (notably FMKorea) intermittently return 430/rate-limit
+        # responses to scheduled crawlers. Do not let the dashboard section disappear
+        # completely when the fresh scrape is blocked; fall back to the latest
+        # already-collected/community-board items for a wider window.
+        items = [item for item in deduped if within_days(item, days=fallback_days)]
+        if items:
+            print(f'[rumor] 최근 {days}일 내 항목 없음: 최근 {fallback_days}일 백업 항목 {len(items)}개 사용')
     items.sort(key=lambda x: (x.get('publishedAt') or '', x.get('recommendCount') or 0, x.get('commentCount') or 0, x.get('viewCount') or 0), reverse=True)
     return items[:10]
 
