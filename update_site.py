@@ -40,6 +40,66 @@ TRANSFER_RUMOR_KEYWORDS = [
 ]
 MANUAL_COMMUNITY_RUMORS = [
     {
+        'id': 'fmkorea-9927004518',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '(거피셜) 안양 승리의 토마스 기차 운행 중단',
+        'summary': '토마스 이적설을 팬 커뮤니티에서 거피셜로 언급한 게시글.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&search_target=title_content&document_srl=9927004518&search_keyword=%EC%95%88%EC%96%91+%EC%9D%B4%EC%A0%81&page=1',
+        'publishedAt': '2026-06-08',
+        'keywords': ['토마스', '이적', '루머'],
+        'commentCount': None,
+        'viewCount': None,
+        'recommendCount': None,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
+    {
+        'id': 'fmkorea-9925897585',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '안양 마테우스',
+        'summary': '마테우스 관련 팬 커뮤니티 이적/외국인 선수 논의 글.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&search_target=title_content&document_srl=9925897585&search_keyword=%EC%95%88%EC%96%91+%EC%98%81%EC%9E%85&page=1',
+        'publishedAt': '2026-06-08',
+        'keywords': ['마테우스', '영입', '외국인'],
+        'commentCount': None,
+        'viewCount': None,
+        'recommendCount': None,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
+    {
+        'id': 'fmkorea-9920077553',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '[단독]‘만능 멀티플레이어’ 토마스, 안양 떠나 울산 ‘전격’ 이적',
+        'summary': '토마스 울산 이적 보도/커뮤니티 공유 글.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&search_target=title_content&document_srl=9920077553&search_keyword=%EC%95%88%EC%96%91+%EC%98%81%EC%9E%85&page=1',
+        'publishedAt': '2026-06-06',
+        'keywords': ['토마스', '울산', '이적'],
+        'commentCount': None,
+        'viewCount': None,
+        'recommendCount': None,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
+    {
+        'id': 'fmkorea-9921007992',
+        'source': 'fmkorea',
+        'sourceLabel': '에펨코리아',
+        'title': '토마스는 그냥 안양의 복덩이였다',
+        'summary': '토마스 관련 이적설 이후 팬 커뮤니티 반응 글.',
+        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&search_target=title_content&document_srl=9921007992&search_keyword=%EC%95%88%EC%96%91+%EC%9D%B4%EC%A0%81&page=1',
+        'publishedAt': '2026-06-06',
+        'keywords': ['토마스', '이적'],
+        'commentCount': None,
+        'viewCount': None,
+        'recommendCount': None,
+        'confidence': 'low',
+        'status': 'unverified',
+    },
+    {
         'id': 'fmkorea-9881766039',
         'source': 'fmkorea',
         'sourceLabel': '에펨코리아',
@@ -530,7 +590,7 @@ def fetch_recent_news(days=7):
     return items[:12]
 
 
-def fetch_community_rumors(days=7, fallback_days=30):
+def fetch_community_rumors(days=7, fallback_days=10):
     items = list(MANUAL_COMMUNITY_RUMORS)
     headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://gall.dcinside.com/'}
     urls = [DCINSIDE_GALLERY_URL]
