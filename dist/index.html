@@ -2290,8 +2290,10 @@
     const prevMonthBtn = document.getElementById('prevMonthBtn');
     const nextMonthBtn = document.getElementById('nextMonthBtn');
 
-    const months = [...new Set(schedule.map(m => m.date.slice(0,7)))];
-    let currentMonth = months.includes('2026.04') ? '2026.04' : months[0];
+    const now = new Date();
+    const calendarCurrentMonth = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const months = [...new Set([...schedule.map(m => m.date.slice(0,7)), calendarCurrentMonth])].sort();
+    let currentMonth = calendarCurrentMonth;
 
     function formatMatchTitle(match) {
       const score = match.status === '종료' ? `${match.homeGoal} : ${match.awayGoal}` : 'vs';
