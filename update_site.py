@@ -38,158 +38,7 @@ TRANSFER_RUMOR_KEYWORDS = [
     '토마스', '원두재', '마테우스', '유키치', '엘쿠라노', '아일톤', 'ㅆㅎㅈ', '썰호정',
     'FW', 'MF', 'DF', 'GK', '공격수', '미드필더', '수비수', '골키퍼', '용병',
 ]
-MANUAL_COMMUNITY_RUMORS = [
-    {
-        'id': 'fmkorea-9927004518',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '(거피셜) 안양 승리의 토마스 기차 운행 중단',
-        'summary': '토마스 이적설을 팬 커뮤니티에서 거피셜로 언급한 게시글.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&search_target=title_content&document_srl=9927004518&search_keyword=%EC%95%88%EC%96%91+%EC%9D%B4%EC%A0%81&page=1',
-        'publishedAt': '2026-06-08',
-        'keywords': ['토마스', '이적', '루머'],
-        'commentCount': None,
-        'viewCount': None,
-        'recommendCount': None,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-    {
-        'id': 'fmkorea-9925897585',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '안양 마테우스',
-        'summary': '마테우스 관련 팬 커뮤니티 이적/외국인 선수 논의 글.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&search_target=title_content&document_srl=9925897585&search_keyword=%EC%95%88%EC%96%91+%EC%98%81%EC%9E%85&page=1',
-        'publishedAt': '2026-06-08',
-        'keywords': ['마테우스', '영입', '외국인'],
-        'commentCount': None,
-        'viewCount': None,
-        'recommendCount': None,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-    {
-        'id': 'fmkorea-9920077553',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '[단독]‘만능 멀티플레이어’ 토마스, 안양 떠나 울산 ‘전격’ 이적',
-        'summary': '토마스 울산 이적 보도/커뮤니티 공유 글.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&search_target=title_content&document_srl=9920077553&search_keyword=%EC%95%88%EC%96%91+%EC%98%81%EC%9E%85&page=1',
-        'publishedAt': '2026-06-06',
-        'keywords': ['토마스', '울산', '이적'],
-        'commentCount': None,
-        'viewCount': None,
-        'recommendCount': None,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-    {
-        'id': 'fmkorea-9921007992',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '토마스는 그냥 안양의 복덩이였다',
-        'summary': '토마스 관련 이적설 이후 팬 커뮤니티 반응 글.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&search_target=title_content&document_srl=9921007992&search_keyword=%EC%95%88%EC%96%91+%EC%9D%B4%EC%A0%81&page=1',
-        'publishedAt': '2026-06-06',
-        'keywords': ['토마스', '이적'],
-        'commentCount': None,
-        'viewCount': None,
-        'recommendCount': None,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-    {
-        'id': 'fmkorea-9881766039',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '안양/인천/광주',
-        'summary': '주축 외국인 선수 2명은 6월 1주차 이후 윤곽 가능성. 국내 2팀/해외 1팀 관심, 영입은 당장 단계는 아니라는 루머.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9881766039',
-        'publishedAt': '2026-05-28',
-        'keywords': ['외국인', '이적', '영입', '루머'],
-        'commentCount': 45,
-        'viewCount': 20000,
-        'recommendCount': 39,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-    {
-        'id': 'fmkorea-9880392934',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '썰호정 단독| 울산은 토마스, 안양은 원두재 영입 추진중',
-        'summary': '토마스 울산행 가능성과 안양의 원두재 영입 추진을 묶어 언급한 팬 커뮤니티 루머.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9880392934',
-        'publishedAt': '2026-05-28',
-        'keywords': ['토마스', '원두재', '영입', '이적'],
-        'commentCount': 29,
-        'viewCount': 30000,
-        'recommendCount': 41,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-    {
-        'id': 'fmkorea-9880457237',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '여러가지 루머',
-        'summary': '울산이 토마스를 노리고, 안양의 원두재 건은 반반이라는 취지의 루머 정리글.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9880457237',
-        'publishedAt': '2026-05-28',
-        'keywords': ['토마스', '원두재', '루머'],
-        'commentCount': 60,
-        'viewCount': 30000,
-        'recommendCount': 65,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-    {
-        'id': 'fmkorea-9879336476',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '안양 빅네임',
-        'summary': '원두재 영입 진행 중이고 분위기가 긍정적이라는 루머. 권경원 어필 언급.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9879336476',
-        'publishedAt': '2026-05-27',
-        'keywords': ['원두재', '영입', '루머'],
-        'commentCount': 23,
-        'viewCount': 20000,
-        'recommendCount': 59,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-    {
-        'id': 'fmkorea-9879391004',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '안양 울산 루머 정리해보면 (상상회로)',
-        'summary': '토마스 매각 자금으로 원두재/재계약/보강을 상상해 본 팬 해석 글.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9879391004',
-        'publishedAt': '2026-05-27',
-        'keywords': ['토마스', '원두재', '이적', '재계약'],
-        'commentCount': 13,
-        'viewCount': 1113,
-        'recommendCount': 5,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-    {
-        'id': 'fmkorea-9857762996',
-        'source': 'fmkorea',
-        'sourceLabel': '에펨코리아',
-        'title': '안양 외국인',
-        'summary': '마테우스는 국내/해외 관심, 구단은 최우선 재계약 대상. 토마스는 해외 1팀 사전 문의와 국내 문의 정도라는 루머.',
-        'url': 'https://www.fmkorea.com/index.php?mid=football_korean&document_srl=9857762996',
-        'publishedAt': '2026-05-22',
-        'keywords': ['마테우스', '토마스', '외국인', '재계약', '이적'],
-        'commentCount': 36,
-        'viewCount': 30000,
-        'recommendCount': 71,
-        'confidence': 'low',
-        'status': 'unverified',
-    },
-]
+MANUAL_COMMUNITY_RUMORS = []  # Deprecated: rumor section now uses live best-effort collection only.
 
 
 def get_json(url, payload=None):
@@ -590,17 +439,29 @@ def fetch_recent_news(days=7):
     return items[:12]
 
 
-def fetch_community_rumors(days=7, fallback_days=10):
-    items = list(MANUAL_COMMUNITY_RUMORS)
+def fetch_community_rumors(days=7, fallback_days=None):
+    """Best-effort live collection from FC Anyang community sources.
+
+    Each community source is optional: one blocked/rate-limited source must not
+    stop the other sources or the static-page build. Stale/manual fallback rows
+    are intentionally not used here; if no recent live rows are collected, the
+    dashboard should render an honest empty state instead of padding old rumors.
+    """
+    items = []
+    source_counts = {'dcinside': 0, 'fmkorea': 0, 'redflame': 0}
+
     headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://gall.dcinside.com/'}
     urls = [DCINSIDE_GALLERY_URL]
     for keyword in TRANSFER_RUMOR_KEYWORDS[:15]:
         urls.append(f'{DCINSIDE_GALLERY_URL}&s_type=search_subject_memo&s_keyword={quote(keyword)}')
     for url in urls:
         try:
-            items.extend(parse_dcinside_rumor_items(fetch_text(url, headers=headers)))
+            parsed = parse_dcinside_rumor_items(fetch_text(url, headers=headers))
+            source_counts['dcinside'] += len(parsed)
+            items.extend(parsed)
         except Exception as e:
             print(f'[rumor] 디시인사이드 수집 오류: {e}')
+
     fmkorea_headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36',
         'Referer': 'https://www.fmkorea.com/',
@@ -609,27 +470,24 @@ def fetch_community_rumors(days=7, fallback_days=10):
     for query in FMKOREA_SEARCH_QUERIES:
         url = f'https://www.fmkorea.com/search.php?mid=football_korean&search_target=title_content&search_keyword={quote(query)}'
         try:
-            items.extend(parse_fmkorea_rumor_items(fetch_text(url, headers=fmkorea_headers)))
+            parsed = parse_fmkorea_rumor_items(fetch_text(url, headers=fmkorea_headers))
+            source_counts['fmkorea'] += len(parsed)
+            items.extend(parsed)
         except Exception as e:
             print(f'[rumor] 에펨코리아 수집 오류({query}): {e}')
+
     try:
         redflame_headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.redflame.co.kr/'}
-        items.extend(parse_redflame_rumor_items(fetch_text(REDFLAME_BOARD_URL, headers=redflame_headers)))
+        parsed = parse_redflame_rumor_items(fetch_text(REDFLAME_BOARD_URL, headers=redflame_headers))
+        source_counts['redflame'] += len(parsed)
+        items.extend(parsed)
     except Exception as e:
         print(f'[rumor] REDFLAME 수집 오류: {e}')
+
     deduped = dedupe_items(items)
-    recent_items = [item for item in deduped if within_days(item, days=days)]
-    if recent_items:
-        items = recent_items
-    else:
-        # Some community sites (notably FMKorea) intermittently return 430/rate-limit
-        # responses to scheduled crawlers. Do not let the dashboard section disappear
-        # completely when the fresh scrape is blocked; fall back to the latest
-        # already-collected/community-board items for a wider window.
-        items = [item for item in deduped if within_days(item, days=fallback_days)]
-        if items:
-            print(f'[rumor] 최근 {days}일 내 항목 없음: 최근 {fallback_days}일 백업 항목 {len(items)}개 사용')
+    items = [item for item in deduped if within_days(item, days=days)]
     items.sort(key=lambda x: (x.get('publishedAt') or '', x.get('recommendCount') or 0, x.get('commentCount') or 0, x.get('viewCount') or 0), reverse=True)
+    print(f"[rumor] best-effort 수집: DCInside {source_counts['dcinside']}개, FMKorea {source_counts['fmkorea']}개, REDFLAME {source_counts['redflame']}개, 최근 {days}일 {len(items)}개")
     return items[:10]
 
 
@@ -1152,3 +1010,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
