@@ -114,10 +114,9 @@ class NewsParsingTests(unittest.TestCase):
 
         self.assertEqual(update_site.dedupe_items(items), [items[0], items[2]])
 
-    def test_fetch_community_rumors_falls_back_when_fresh_scrape_is_empty(self):
+    def test_fetch_community_rumors_collects_all_sources_best_effort(self):
         now = datetime(2026, 6, 8, tzinfo=timezone(timedelta(hours=9)))
         old_datetime = update_site.datetime
-        old_manual = update_site.MANUAL_COMMUNITY_RUMORS
         old_fetch_text = update_site.fetch_text
 
         class FixedDateTime(datetime):
@@ -125,29 +124,62 @@ class NewsParsingTests(unittest.TestCase):
             def now(cls, tz=None):
                 return now if tz else now.replace(tzinfo=None)
 
+        dc_html = '''
+        <tr class="ub-content us-post" data-no="701">
+          <td class="gall_num">701</td><td class="gall_tit ub-word"><a href="/mgallery/board/view/?id=fcanyang2013&no=701">안양 영입 루머</a></td>
+          <td class="gall_writer">ㅇㅇ</td><td class="gall_date" title="2026-06-08 13:46:00">06.08</td><td class="gall_count">14</td><td class="gall_recommend">1</td>
+        </tr>
+        '''
+        fmkorea_html = '<a href="/123456789">FC안양 외국인 공격수 영입 루머</a>'
+        redflame_html = r'''
+        \"href\":\"/post/4675?\" blah
+        dangerouslySetInnerHTML\":{\"__html\":\"오늘 ㅆㅎㅈ에서 나온 루머\"}
+        \"children\":37 \"children\":\"0일전\" \"children\":4 \"children\":4 \"children\":694
+        '''
+
+        def fake_fetch_text(url, *args, **kwargs):
+            if 'gall.dcinside.com' in url:
+                return dc_html
+            if 'fmkorea.com' in url:
+                return fmkorea_html
+            if 'redflame.co.kr' in url:
+                return redflame_html
+            return ''
+
         try:
             update_site.datetime = FixedDateTime
-            item = {
-                'id': 'manual-old-but-useful',
+            update_site.fetch_text = fake_fetch_text
+            items = update_site.fetch_community_rumors(days=7)
+        finally:
+            update_site.datetime = old_datetime
+            update_site.fetch_text = old_fetch_text
+
+        sources = {item['source'] for item in items}
+        self.assertEqual(sources, {'dcinside', 'fmkorea', 'redflame'})
+        self.assertTrue(all(item['status'] == 'unverified' for item in items))
+
+    def test_fetch_community_rumors_does_not_use_stale_manual_fallback(self):
+        old_manual = update_site.MANUAL_COMMUNITY_RUMORS
+        old_fetch_text = update_site.fetch_text
+        try:
+            update_site.MANUAL_COMMUNITY_RUMORS = [{
+                'id': 'manual-old',
                 'source': 'fmkorea',
                 'sourceLabel': '에펨코리아',
                 'title': '안양 외국인 영입 루머',
                 'url': 'https://example.com/rumor',
-                'publishedAt': '2026-05-28',
+                'publishedAt': '2026-05-01',
                 'keywords': ['영입', '루머'],
                 'confidence': 'low',
                 'status': 'unverified',
-            }
-            update_site.MANUAL_COMMUNITY_RUMORS = [item]
+            }]
             update_site.fetch_text = lambda *args, **kwargs: ''
-
             items = update_site.fetch_community_rumors(days=7, fallback_days=30)
         finally:
-            update_site.datetime = old_datetime
             update_site.MANUAL_COMMUNITY_RUMORS = old_manual
             update_site.fetch_text = old_fetch_text
 
-        self.assertEqual(items, [item])
+        self.assertEqual(items, [])
 
 
 if __name__ == '__main__':
